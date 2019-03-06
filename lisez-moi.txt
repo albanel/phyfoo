@@ -1,0 +1,29 @@
+
+Différentes parties du code utilisent la fonction tryparallelize qui partage un job en un certain nombre d'autres, et ensuite ceux ci sont soumis à un certain nombre de qsub avec pour job un fichier dans lequel
+les erreurs sont renvoyées. Ce fichier est régulièrement scanné, et le processus en cours est stoppé si la moindre ligne est apparue dans ce fichier, autrement dit si on a une erreur. Or un message d'erreur du à
+la version de python peut apparaître, indiquant à l'utilisateur d'utiliser des version plus récentes de python comme 2.7.15 ou python 3. Pour régler ce souci, il faut modifier la version de python sourcée dans l
+e fichier script/env.sh, car le programme est fait de façon à ce que ce fichier soit sourcé avant chaque job soumis au qsub.
+
+- Dico
+
+Lors de la création des tables, le programme fonctionne ainsi : il crée les tables génériques (vides), les tables spécifiques (vides), il remplit les tables génériques puis les tables spécifiques. Or pour créer
+les tables spécifiques, il faut les identifiants des espèces (gene_id) et pour cela une partie des tables génériques doit être remplie. C'est pour cela que la table current_genome_db est remplie avant les autres
+, après la création des tables génériques vides (il serait d'ailleurs peut être pertinent de faire créer-remplir puis créer remplir pour les génériques puis spécifiques pour avoir moins de code). Mais le vrai pr
+oblème réside surtout dans le fait que l'on accède aux noms des espèces via un dictionnaire dRelationGenomeDBId_SpecieName. Sa création est testée (try-except) au début du code via l'accès à la table current_gen
+ome_db mais le souci est que la table n'existe en général pas lorsque cette partie du code est parcourue. Ainsi lorsque plus tard, on veut accéder à dRelationGenomeDBId_SpecieName, celui-ci n'est pas défini. Au 
+lieu de relancer toujours le code, pour régler ce souci j'ai créé une fonction dico() (changer de nom) qui exporte en variable globale dRelationGenomeDBId_SpecieName ainsi que tSpeciesTable, à partir de laquelle
+ dRelationGenomeDBId_SpecieName est créé et qui est parfois utilisée comme telle. Cette fonction dico() peut ainsi être placée aux endroits stratégiques du code, au niveau des étapes qui en ont besoin, afin que 
+ces variables existent lorsque c'est nécessaire. Le code bloque au niveau de la création des tables spécifiques ; mais le problème ne devrait pas avoir lieu plus tard dans le code, car même si on relance uniquem
+ent certaines étapes, le dictionnaire devrait se créer proprement au début. Mais pour le moment j'ai mis le try-except du dictionnaire en commentaire, et on utilise la fonction dico aux endroits appropriés.
+Perspectives : il serait pertinent de créer une classe avec ce dictionnaire, une classe dont on pourrait appeler les attributs dRelationGenomeDBId_SpecieName et tSpeciesTable. Cela serait plus propre, car l'expo
+rt des variables globales n'est pas la meilleure solution.
+
+- SpeciesFilter
+
+Cette variable peut être modifiée dans le fichier config. Elle intervient dans différents endroits : au début du code au niveau du téléchargement des données, et plus tard lorsqu'on créée les tables spécifiques.
+ Seules les données spécifiques des espèces indiquées seront téléchargées en utilisant le module re ; la page de téléchargement d'Ensembl FTP est scannée et seuls les fichiers correspondant à l'expression réguli
+ère de speciesFilter seront téléchargés. Dans la version précédente, on pouvait appliquer ce filtre en ne téléchargeant les données que d'une espèce, ou toutes les espèces. Ici on peut indiquer plusieurs espèces
+ dont le nom est séparé par une virgule. Ensuite, on fera un split(",") sur speciesFilter et on pourra itérer dessus afin de prendre en compte ces différentes espèces. Ce filtre fonctionne ainsi correctement pou
+r plusieurs espèces pour le téléchargement des données, la création des tables spécifiques et également à la dernière étape, pour la récupération des données Fasta (ce filtre n'était pas appliqué à cet endroit,
+mais je l'ai rajouté).
+
