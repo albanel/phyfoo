@@ -1,2 +1,2 @@
 # phyfoo
-Orthocis2 developpement
+Orthocis2 development
