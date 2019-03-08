@@ -26,3 +26,7 @@ Cette variable peut être modifiée dans le fichier config. Elle intervient dans
  dont le nom est séparé par une virgule. Ensuite, on fera un split(",") sur speciesFilter et on pourra itérer dessus afin de prendre en compte ces différentes espèces. Ce filtre fonctionne ainsi correctement pou
 r plusieurs espèces pour le téléchargement des données, la création des tables spécifiques et également à la dernière étape, pour la récupération des données Fasta (ce filtre n'était pas appliqué à cet endroit,
 mais je l'ai rajouté, sinon cela fonctionne mais on envoie des scripts inutiles qui renvoient des erreurs).
+
+- Current_tool
+
+lorsqu'on redémarre le programme, le remplissage de current_tool peut poser souci. J'ai donc remplacé 'insert' par 'insert ignore' afin de recommencer le remplissage en ignorant les doublons.
