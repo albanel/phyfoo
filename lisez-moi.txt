@@ -30,3 +30,7 @@ mais je l'ai rajouté, sinon cela fonctionne mais on envoie des scripts inutiles
 - Current_tool
 
 lorsqu'on redémarre le programme, le remplissage de current_tool peut poser souci. J'ai donc remplacé 'insert' par 'insert ignore' afin de recommencer le remplissage en ignorant les doublons.
+
+- Colonne "status"
+
+Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été supprimée. Elle est présente dans les tables spécifiques current_gene et current_transcript (par exemple current_gene_209 et current_transcript_209 pour le gorille). Il faut supprimer cette colonne lors de la création des tables, sinon on a un décalage (pour current_transcript on a la version à la place du stable_id) qui empêche le reste du pipeline de s'exécuter correctement.
