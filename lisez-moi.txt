@@ -1,3 +1,4 @@
+- Version de python
 
 Différentes parties du code utilisent la fonction tryparallelize qui partage un job en un certain nombre d'autres, et ensuite ceux ci sont soumis à un certain nombre de qsub avec pour job un fichier dans lequel
 les erreurs sont renvoyées. Ce fichier est régulièrement scanné, et le processus en cours est stoppé si la moindre ligne est apparue dans ce fichier, autrement dit si on a une erreur. Or un message d'erreur du à
@@ -34,3 +35,7 @@ lorsqu'on redémarre le programme, le remplissage de current_tool peut poser sou
 - Colonne "status"
 
 Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été supprimée. Elle est présente dans les tables spécifiques current_gene et current_transcript (par exemple current_gene_209 et current_transcript_209 pour le gorille). Il faut supprimer cette colonne lors de la création des tables, sinon on a un décalage (pour current_transcript on a la version à la place du stable_id) qui empêche le reste du pipeline de s'exécuter correctement.
+
+- Current_tool : 
+
+J'ai rajouté un insert IGNORE pour la création de cette table créée à part. Comme ça elle ne renvoie pas de message d'erreur si elle est déjà créée.
