@@ -39,3 +39,7 @@ Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été 
 - Current_tool : 
 
 J'ai rajouté un insert IGNORE pour la création de cette table créée à part. Comme ça elle ne renvoie pas de message d'erreur si elle est déjà créée.
+
+- Divers :
+
+Certains fichiers dont je ne connais pas l'utilité ont été déplacés dans un répertoire "peut_etre_utile" dans mon home sur genocluster2.
