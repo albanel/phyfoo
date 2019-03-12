@@ -42,4 +42,11 @@ J'ai rajouté un insert IGNORE pour la création de cette table créée à part.
 
 - Divers :
 
-Certains fichiers dont je ne connais pas l'utilité ont été déplacés dans un répertoire "peut_etre_utile" dans mon home sur genocluster2.
+Certains fichiers dont je ne connais pas l'utilité ont été déplacés dans un répertoire "peut_etre_utile" dans mon home sur genocluster2. Ils peuvent être dangereux car ils contiennent les mots de passe admin de la base orthocis2, qui doit rester intact.
+Liste de ces fichiers :
+
+	- tout le répertoire tmp_avoir ; ceux ci correspondent aux fichiers temporaires laissés par mon prédecesseur, je les ai gardés au cas où.
+	- config/genouestDB2.conf et config/good_87.conf
+	- src/temp***711.sh
+	- src/dev/deletemotifdata.sh
+	- scr/script/qsubrunscan1jasparMatrix.sh 
