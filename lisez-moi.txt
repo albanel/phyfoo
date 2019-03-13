@@ -34,7 +34,7 @@ lorsqu'on redémarre le programme, le remplissage de current_tool peut poser sou
 
 - Colonne "status"
 
-Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été supprimée. Elle est présente dans les tables spécifiques current_gene et current_transcript (par exemple current_gene_209 et current_transcript_209 pour le gorille). Il faut supprimer cette colonne lors de la création des tables, sinon on a un décalage (pour current_transcript on a la version à la place du stable_id) qui empêche le reste du pipeline de s'exécuter correctement.
+Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été supprimée. Elle est présente dans les tables spécifiques current_gene et current_transcript (par exemple current_gene_209 et current_transcript_209 pour le gorille). Il faut supprimer cette colonne lors de la création des tables, sinon on a un décalage (pour current_transcript on a la version à la place du stable_id) qui empêche le reste du pipeline de s'exécuter correctement. Le reste des tables semble correcte, la seule chose est que certains fichiers ont davantage de colonnes que les tables qui les accueillent (method_link, genome_db,...) ; cela peut-il poser un souci ? En tout cas les tables ont l'air correctes et si elles ont n colonnes enregistrent les n premières colonnes du fichier.
 
 - Current_tool : 
 
