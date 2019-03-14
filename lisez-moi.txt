@@ -40,7 +40,11 @@ Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été 
 
 J'ai rajouté un insert IGNORE pour la création de cette table créée à part. Comme ça elle ne renvoie pas de message d'erreur si elle est déjà créée.
 
-- Divers :
+- Parallélisation des composantes connexes et cliques globales : 
+
+Actuellement le programme fais les calculs non-global puis global pour les composantes connexes puis les cliques. Etant donné que les évènements sont indépendants (est-ce vraiment le cas ?) il serait peut-être judicieux de paralléliser les deux procédés pour gagner plusieurs heures.  
+
+Divers :
 
 Certains fichiers dont je ne connais pas l'utilité ont été déplacés dans un répertoire "peut_etre_utile" dans mon home sur genocluster2. Ils peuvent être dangereux car ils contiennent les mots de passe admin de la base orthocis2, qui doit rester intact.
 Liste de ces fichiers :
