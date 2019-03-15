@@ -46,19 +46,11 @@ Actuellement le programme fais les calculs non-global puis global pour les compo
 
 - Calcul des composantes connexes :
 
-Dans le script compco.pl, une variable est initialisée au début : maxnei, le
-nombre de lien max, qui
-empêche une partie de l'exécution du script si elle est dépassée. Elle était à
-150, ce qui convenait pour le calcul des composantes connexes non globales ;
-mais ici la variable est rapidement dépassée, car d'après mes calculs certains
-noeuds sont liés à 1557 autres (gène 29300002158427). Mais à quoi sert une telle variable ?
+Dans le script compco.pl, une variable est initialisée au début : maxnei, le nombre de lien max, qui empêche une partie de l'exécution du script si elle est dépassée. Elle était à 150, ce qui convenait pour le calcul des composantes connexes non globales ; mais ici la variable est rapidement dépassée, car d'après mes calculs certains noeuds sont liés à 1557 autres (gène 29300002158427). Du coup ça ne beug plus avec la variable mise à 1600. Mais à quoi sert une telle variable ?
 
 Dossier "to_save" :
 
-Ce fichier contient les fichiers que j'ai modifiés. Je les copie régulièrement
-sur l'ordi local pour les sauver sur github
-(https://github.com/albanel/phyfoo). Je ne peux pas suivre tous les dossiers
-pour des raisons de place. 
+Ce fichier contient les fichiers que j'ai modifiés. Je les copie régulièrement sur l'ordi local pour les sauver sur github (https://github.com/albanel/phyfoo). Je ne peux pas suivre tous les dossiers pour des raisons de place. 
 
 Divers :
 
