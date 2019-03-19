@@ -219,6 +219,7 @@ jobexecdir=oConfig.get('cf_jobexecdir')
 iMaxJobForParallelize=int(oConfig.get('cf_maxJob'))-1
 iMaxJobForParallelizeHLink=int(oConfig.get('cf_maxJobHLink'))-1
 excludedGID=oConfig.get('cf_excludedGID')
+checkdir=oConfig.get('cf_checkdir')
 #excludedGIDAr=[]
 #if excludedGID and len(excludedGID)>1:
 #		for e in excludedGID.split(","):
@@ -410,9 +411,8 @@ def dico():
         	printDebug("table not created yet ! (normal for step1 ) ",sStdOutFile,bPrint)
 dico()
 
-sEnsemblComparaFolder=ensdir+"/ensembl_compara_"+sVersionEnsembl
 
-check_database(host,database,user,pw,db,bHaveMySQLdb,False,sEnsemblComparaFolder)
+check_generic_tables(host,database,user,pw,db,bHaveMySQLdb,checkdir)
 
 
 	

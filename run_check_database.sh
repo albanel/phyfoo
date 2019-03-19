@@ -20,7 +20,8 @@ SRC=/groups/dyliss/orthocis_albane/pipeline/src
 cd $SRC
 MODINSTALLDIR=${SRC}/pymodule
 MODORTHODIR=${SRC}/orthocismodule
-PYTHONPATH=$PYTHONPATH:$MODINSTALLDIR:$MODORTHODIR
+CHECKDIR=${SRC}/check_database
+PYTHONPATH=$PYTHONPATH:$MODINSTALLDIR:$MODORTHODIR:$CHECKDIR
 export PYTHONPATH
 CONF=config/latest.conf
 

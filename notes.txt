@@ -38,7 +38,7 @@ Dans la nouvelle version d'Ensembl(95), la colonne "status" a visiblement été 
 
 - Current_tool :
 
-J'ai rajouté un insert IGNORE pour la création de cette table créée à part. Comme ça elle ne renvoie pas de message d'erreur si elle est déjà créée.
+J'ai rajouté un insert IGNORE pour la création de cette table créée à part. Comme ça elle ne renvoie pas de message d'erreur si elle est déjà créée et ne bloque pas la suite du processus.
 
 - Parallélisation des composantes connexes et cliques globales :
 
@@ -48,11 +48,11 @@ Actuellement le programme fais les calculs non-global puis global pour les compo
 
 Dans le script compco.pl, une variable est initialisée au début : maxnei, le nombre de lien max, qui empêche une partie de l'exécution du script si elle est dépassée. Elle était à 150, ce qui convenait pour le calcul des composantes connexes non globales ; mais ici la variable est rapidement dépassée, car d'après mes calculs certains noeuds sont liés à 1557 autres (gène 29300002158427). Du coup ça ne beug plus avec la variable mise à 1600. Mais à quoi sert une telle variable ?
 
-Dossier "to_save" :
+- Dossier "to_save" :
 
 Ce fichier contient les fichiers que j'ai modifiés. Je les copie régulièrement sur l'ordi local pour les sauver sur github (https://github.com/albanel/phyfoo). Je ne peux pas suivre tous les dossiers pour des raisons de place. 
 
-Divers :
+- Fichiers "dangereux" :
 
 Certains fichiers dont je ne connais pas l'utilité ont été déplacés dans un répertoire "peut_etre_utile" dans mon home sur genocluster2. Ils peuvent être dangereux car ils contiennent les mots de passe admin de la base orthocis2, qui doit rester intact.
 Liste de ces fichiers :
@@ -63,3 +63,11 @@ Liste de ces fichiers :
         - src/dev/deletemotifdata.sh
         - scr/script/qsubrunscan1jasparMatrix.sh
 
+- Calcul des cliques (remplissage de current_clique_element) : le programme renvoie régulièrement une erreur qui interrompt le processus car il y a trop de connexions simultanées sur la DB (protection anti intrusion). Pour éviter ce souci j'ai rajouté un time.sleep de 30 secondes entre chaque job, cela permet d'éviter ce souci tout en perdant peu de temps.
+
+- check_database :
+
+Pour éviter de reperdre du temps avec des tables qui ne sont pas à jour par
+rapport aux fichiers téléchargés sur Ensembl (cf colonne "STATUS") je
+travaille sur un petit module de vérification de la base de données. Celui ira
+chercher les champs des tables d'intérêt sur la page d'Ensembl et les comparera à ceux des tables que l'on souhaite peupler.
