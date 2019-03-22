@@ -63,7 +63,7 @@ Liste de ces fichiers :
         - src/dev/deletemotifdata.sh
         - scr/script/qsubrunscan1jasparMatrix.sh
 
-- Calcul des cliques (remplissage de current_clique_element) : le programme renvoie régulièrement une erreur qui interrompt le processus car il y a trop de connexions simultanées sur la DB (protection anti intrusion). Pour éviter ce souci j'ai rajouté un time.sleep de 30 secondes entre chaque job, cela permet d'éviter ce souci tout en perdant peu de temps.
+- Calcul des cliques (remplissage de current_clique_element) : le programme renvoie régulièrement une erreur qui interrompt le processus car il y a trop de connexions simultanées sur la DB (protection anti intrusion). Pour éviter ce souci j'ai rajouté un time.sleep de 30 secondes entre chaque job, cela permet d'éviter ce souci tout en perdant peu de temps. Mais le souci peut persister quand même, c'est assez aléatoire, la connexion reste fragile... moyen de changer ça ? Changer la variable de max_connections_error ?
 
 - check_database :
 
@@ -71,3 +71,45 @@ Pour éviter de reperdre du temps avec des tables qui ne sont pas à jour par
 rapport aux fichiers téléchargés sur Ensembl (cf colonne "STATUS") je
 travaille sur un petit module de vérification de la base de données. Celui ira
 chercher les champs des tables d'intérêt sur la page d'Ensembl et les comparera à ceux des tables que l'on souhaite peupler.
+Tous les fichiers nécessaires sont dans le dossier check_database. Ce dossier a donc été ajouté au python path du fichier run, et est également une variable du fichier de configuration "cf_checkdir" puis "checkdir". Dans le fichier BuildOrthocis on fait appelle à la fonction check_generic_tables par exemple (après la création des tables et avant leur remplissage). Celle-ci est dans le module check_database.py. Dans ce fichier, pour chaque table (ici générique) on ajoute à un dictionnaire en clé la table et en valeur la description, c'est à dire les champs de la table. Le script python execute ensuite un fichier bash (check_database.sh) pour télécharger (curl) la page d'Ensembl décrivant les données spécifiques et la mettre dans un fichier particulier (ce fichier prend en argument le répertoire check dans lequel tout se passera, sinon on aura un souci de path). Ce script bash exécutera ensuite un script python (read_html) qui traitera le fichier téléchargé par curl, et trouvera les champs des différentes tables génériques pour les mettre dans un dictionnaire. Notons que le package "beautifulSoup" pour parser le html doit fonctionner, d'où le second intérêt du fichier bash qui active un environnement dans lequel BeautifulSoup fonctionne, execute le programme puis désactive l'environnement.  
+Le programma affiche les deux dictionnaires, il d'agira ensuite de les comparer pour voir si les champs sont les mêmes.
+
+- Répertoires dans "jobs" :
+
+Il serait peut être judicieux que le calcul des cliques se fasse dans un
+dossier "CLGLOBAL" comme pour les autres jobs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
