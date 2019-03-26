@@ -1,0 +1,22 @@
+Réunion du 26 mars :
+
+- Se renseigner sur la manière dont l'homologie a été déterminée sur Ensembl.
+- Qualifier les liens d'homologie, déterminer leur qualité, voir si on pourrait pas retirer les liens obtenus selon certaines méthodes.
+- Le réseau global contient-il les liens one2one ? 
+- Que représente vraiment le global_id ? Dans ce contexte, que représentent les cliques ? Lien si on moins un orthologue ou autres ?
+- Dans l'interface finale (en développement) on choisit un motif (TFBS), autres éléments (p-value, etc), une espèce principales puis une ou des espèces secondaires par "job" voulu (orthology seule, orthology & matching : hits dans la zone de recherche).
+- Le o2o est implémenté, pour le o2m ou m2m il serait judicieux de conserver le même calcul de cliques étant donné qu'il s'agit de requêtes simples. 
+- On pourrait utiliser les composantes connexes au lieu d'uniquement les cliques ; mais dans ce cas-là poids des arcs + pertinence à voir, et puisqu'il s'agit d'une grande voir très grande structure de données il faudrait vraiment élaguer selon ces critères.
+- Les cliques pour le global sont assez différentes avec le global_id qui est un identifiant "virtuel".
+- Sémantique du lien dans la clique est important : a ou a au moins un orthologue dans l'espèce donnée ? Seuil ?
+- La table clique_bool n'est pas utilisée, c'est pour cela qu'elle n'est pas créée dans la nouvelle version du script BuildOrthocis.
+- S'intéresser au script retrieve_json_faster.
+- La table job_id traite les jobs relatifs aux scans (matrix, etc).
+
+
+A faire : 
+
+- Continuer les stats sur le type de relation, et les stats par espèce.
+- Faire un script qui génère toutes les stats : faut-il filtrer les données ou non ? Premier "délivrable" du rapport.
+- Réfléchir au nouveau calcul des cliques avec graphtools ; tester sur VM, puis singularity sur le cluster (virtualEnv ?).
+- Doc Ensembl : comment sont gérées les données ?
