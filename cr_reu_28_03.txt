@@ -1,0 +1,3 @@
+Je peux tenter d'utiliser Singularity sur le cluster pour utiliser graphtools. Singularity permet notamment d'executer un script à l'intérieur d'un docker qui peut être sur dockerhub. Je peux donc utiliser directement le docker du gars qui a créé graphtools. Mais si j'ai des modifs à faire, notamment pour utiliser de nouveaux modules python qui seront indiqués dans le dockerfile, je devrai utiliser docker sur ma VM (pas possible sur le cluster) pour créer un nouveau dockerfile et donc un nouveau docker que je devrais déployer sur dockerhub pour l'utiliser sur singularity. 
+Voir le tuto singularity que François m'a envoyé par mail.
+

@@ -1,0 +1,124 @@
+The network has 2160534 genes and 96174288 links between them.
+The network involves 101 species.
+The specie mus_musculus has 23967 total genes and 2049263 total links in the network for a connectivity of 85.50352568114491
+The specie homo_sapiens has 25398 total genes and 1991421 total links in the network for a connectivity of 78.40857547838412
+The specie rattus_norvegicus has 22777 total genes and 1971078 total links in the network for a connectivity of 86.53808666637397
+The specie macaca_mulatta has 27143 total genes and 1998496 total links in the network for a connectivity of 73.62841248203956
+The specie cavia_aperea has 14311 total genes and 1425333 total links in the network for a connectivity of 99.5970232688142
+The specie cavia_porcellus has 18036 total genes and 1787005 total links in the network for a connectivity of 99.0798957640275
+The specie chinchilla_lanigera has 17784 total genes and 1762132 total links in the network for a connectivity of 99.08524516419253
+The specie cricetulus_griseus_crigri has 20028 total genes and 1921659 total links in the network for a connectivity of 95.94862192929898
+The specie dipodomys_ordii has 16592 total genes and 1642981 total links in the network for a connectivity of 99.02248071359692
+The specie fukomys_damarensis has 17274 total genes and 1709569 total links in the network for a connectivity of 98.96775500752577
+The specie heterocephalus_glaber_female has 23686 total genes and 2036729 total links in the network for a connectivity of 85.98872751836528
+The specie heterocephalus_glaber_male has 23450 total genes and 2007967 total links in the network for a connectivity of 85.62759061833688
+The specie ictidomys_tridecemlineatus has 18022 total genes and 1759695 total links in the network for a connectivity of 97.6414937298857
+The specie jaculus_jaculus has 16888 total genes and 1665235 total links in the network for a connectivity of 98.60463050686879
+The specie mesocricetus_auratus has 18118 total genes and 1760471 total links in the network for a connectivity of 97.16696103322663
+The specie microtus_ochrogaster has 20764 total genes and 1859569 total links in the network for a connectivity of 89.5573588903872
+The specie nannospalax_galili has 18098 total genes and 1764915 total links in the network for a connectivity of 97.51989170074042
+The specie octodon_degus has 17786 total genes and 1723953 total links in the network for a connectivity of 96.92752726863826
+The specie peromyscus_maniculatus_bairdii has 19071 total genes and 1861257 total links in the network for a connectivity of 97.59619317288029
+The specie cercocebus_atys has 21754 total genes and 1961847 total links in the network for a connectivity of 90.18327663877908
+The specie macaca_fascicularis has 27865 total genes and 2076358 total links in the network for a connectivity of 74.51491117889826
+The specie macaca_nemestrina has 21949 total genes and 1966470 total links in the network for a connectivity of 89.59269214998406
+The specie mandrillus_leucophaeus has 21608 total genes and 1930864 total links in the network for a connectivity of 89.35875601629026
+The specie propithecus_coquereli has 17808 total genes and 1725448 total links in the network for a connectivity of 96.89173405211142
+The specie rhinopithecus_bieti has 21783 total genes and 1944549 total links in the network for a connectivity of 89.26910893816279
+The specie microcebus_murinus has 18944 total genes and 1799495 total links in the network for a connectivity of 94.990234375
+The specie cebus_capucinus has 20168 total genes and 1910444 total links in the network for a connectivity of 94.72649742165807
+The specie gorilla_gorilla has 27715 total genes and 2069738 total links in the network for a connectivity of 74.67934331589392
+The specie sus_scrofa has 21898 total genes and 1918902 total links in the network for a connectivity of 87.62909854781259
+The specie cricetulus_griseus_chok1gshd has 21212 total genes and 2018773 total links in the network for a connectivity of 95.17127097869131
+The specie rhinopithecus_roxellana has 22067 total genes and 1970616 total links in the network for a connectivity of 89.30149091403453
+The specie carlito_syrichta has 17697 total genes and 1696131 total links in the network for a connectivity of 95.84285472113918
+The specie papio_anubis has 27583 total genes and 2070636 total links in the network for a connectivity of 75.06928180400972
+The specie capra_hircus has 22345 total genes and 1967849 total links in the network for a connectivity of 88.06663683150593
+The specie callithrix_jacchus has 24209 total genes and 1917836 total links in the network for a connectivity of 79.21995951918709
+The specie danio_rerio has 21049 total genes and 1895641 total links in the network for a connectivity of 90.05848258824648
+The specie panthera_pardus has 19821 total genes and 1871592 total links in the network for a connectivity of 94.42470107461783
+The specie panthera_tigris_altaica has 17847 total genes and 1705998 total links in the network for a connectivity of 95.59018322407127
+The specie felis_catus has 22026 total genes and 1906027 total links in the network for a connectivity of 86.53532189230909
+The specie sphenodon_punctatus has 16350 total genes and 1580713 total links in the network for a connectivity of 96.67969418960244
+The specie gallus_gallus has 15394 total genes and 1522544 total links in the network for a connectivity of 98.90502793296089
+The specie acanthochromis_polyacanthus has 22561 total genes and 2012691 total links in the network for a connectivity of 89.21107220424626
+The specie amphilophus_citrinellus has 22287 total genes and 1984103 total links in the network for a connectivity of 89.0251267555077
+The specie amphiprion_ocellaris has 22752 total genes and 2055426 total links in the network for a connectivity of 90.34045358649789
+The specie amphiprion_percula has 23128 total genes and 2059039 total links in the network for a connectivity of 89.02797474922173
+The specie anabas_testudineus has 21864 total genes and 1977217 total links in the network for a connectivity of 90.43253750457373
+The specie astatotilapia_calliptera has 25917 total genes and 2212679 total links in the network for a connectivity of 85.37558359378015
+The specie cynoglossus_semilaevis has 20281 total genes and 1836351 total links in the network for a connectivity of 90.54538730831813
+The specie cyprinodon_variegatus has 21518 total genes and 1960875 total links in the network for a connectivity of 91.12719583604424
+The specie esox_lucius has 21862 total genes and 1939303 total links in the network for a connectivity of 88.70656847497942
+The specie fundulus_heteroclitus has 21760 total genes and 1966753 total links in the network for a connectivity of 90.38386948529411
+The specie gambusia_affinis has 21336 total genes and 1929849 total links in the network for a connectivity of 90.45036557930258
+The specie haplochromis_burtoni has 22951 total genes and 2050871 total links in the network for a connectivity of 89.35867718182215
+The specie kryptolebias_marmoratus has 20818 total genes and 1908428 total links in the network for a connectivity of 91.67201460274762
+The specie labrus_bergylta has 22231 total genes and 1965377 total links in the network for a connectivity of 88.40704421753408
+The specie mastacembelus_armatus has 21186 total genes and 1929441 total links in the network for a connectivity of 91.07150948739734
+The specie maylandia_zebra has 26229 total genes and 2250544 total links in the network for a connectivity of 85.80365244576613
+The specie monopterus_albus has 20686 total genes and 1873954 total links in the network for a connectivity of 90.59044764575074
+The specie neolamprologus_brichardi has 22850 total genes and 2023231 total links in the network for a connectivity of 88.54402625820569
+The specie oryzias_latipes_hni has 21625 total genes and 1910589 total links in the network for a connectivity of 88.35093641618496
+The specie oryzias_latipes_hsok has 22073 total genes and 1950369 total links in the network for a connectivity of 88.35994201060119
+The specie oryzias_melastigma has 21553 total genes and 1939156 total links in the network for a connectivity of 89.97151208648448
+The specie paramormyrops_kingsleyae has 22329 total genes and 1971786 total links in the network for a connectivity of 88.30605938465672
+The specie periophthalmus_magnuspinnatus has 20500 total genes and 1819777 total links in the network for a connectivity of 88.76960975609757
+The specie poecilia_latipinna has 22742 total genes and 2053668 total links in the network for a connectivity of 90.30287573652274
+The specie poecilia_mexicana has 23129 total genes and 2080454 total links in the network for a connectivity of 89.95001945609408
+The specie poecilia_reticulata has 22373 total genes and 2004126 total links in the network for a connectivity of 89.57788405667546
+The specie pundamilia_nyererei has 23273 total genes and 2050060 total links in the network for a connectivity of 88.0874833498045
+The specie scophthalmus_maximus has 20669 total genes and 1879970 total links in the network for a connectivity of 90.95602109439257
+The specie seriola_dumerili has 22584 total genes and 2032405 total links in the network for a connectivity of 89.99313673397096
+The specie seriola_lalandi_dorsalis has 23266 total genes and 2049418 total links in the network for a connectivity of 88.08639216023381
+The specie stegastes_partitus has 22075 total genes and 1976499 total links in the network for a connectivity of 89.53562853907135
+The specie takifugu_rubripes has 19542 total genes and 1803739 total links in the network for a connectivity of 92.30063453075427
+The specie xiphophorus_couchianus has 19911 total genes and 1768916 total links in the network for a connectivity of 88.84114308673597
+The specie xiphophorus_maculatus has 22643 total genes and 2038394 total links in the network for a connectivity of 90.02314180983085
+The specie oryzias_latipes has 22782 total genes and 1995000 total links in the network for a connectivity of 87.56913352646826
+The specie vulpes_vulpes has 22679 total genes and 1934317 total links in the network for a connectivity of 85.29110630980202
+The specie canis_lupus_dingo has 23200 total genes and 1959974 total links in the network for a connectivity of 84.48163793103448
+The specie bos_taurus has 22735 total genes and 1978195 total links in the network for a connectivity of 87.01099626127117
+The specie phascolarctos_cinereus has 18807 total genes and 1753559 total links in the network for a connectivity of 93.2396979847929
+The specie ursus_americanus has 22411 total genes and 1881342 total links in the network for a connectivity of 83.94725804292536
+The specie ursus_maritimus has 21011 total genes and 1792001 total links in the network for a connectivity of 85.28870591594878
+The specie chrysemys_picta_bellii has 20586 total genes and 1821910 total links in the network for a connectivity of 88.50238025842806
+The specie equus_asinus_asinus has 21247 total genes and 1919486 total links in the network for a connectivity of 90.34150703628748
+The specie equus_caballus has 21867 total genes and 1962742 total links in the network for a connectivity of 89.7581744180729
+The specie gopherus_agassizii has 20219 total genes and 1757225 total links in the network for a connectivity of 86.90958998961374
+The specie nomascus_leucogenys has 25863 total genes and 1990485 total links in the network for a connectivity of 76.9626493446236
+The specie saimiri_boliviensis_boliviensis has 19383 total genes and 1849959 total links in the network for a connectivity of 95.44234638600835
+The specie mus_caroli has 19902 total genes and 1865263 total links in the network for a connectivity of 93.72238970957693
+The specie mus_pahari has 19418 total genes and 1846857 total links in the network for a connectivity of 95.1105675146771
+The specie aotus_nancymaae has 20230 total genes and 1909080 total links in the network for a connectivity of 94.36875926841324
+The specie colobus_angolensis_palliatus has 21152 total genes and 1929825 total links in the network for a connectivity of 91.23605332829047
+The specie pan_paniscus has 27742 total genes and 2043387 total links in the network for a connectivity of 73.65680196092568
+The specie pan_troglodytes has 29180 total genes and 2133778 total links in the network for a connectivity of 73.1246744345442
+The specie eptatretus_burgeri has 10682 total genes and 1151088 total links in the network for a connectivity of 107.7595955813518
+The specie astyanax_mexicanus has 23177 total genes and 2005391 total links in the network for a connectivity of 86.52504638218925
+The specie hippocampus_comes has 19260 total genes and 1756858 total links in the network for a connectivity of 91.21796469366562
+The specie ictalurus_punctatus has 20801 total genes and 1864144 total links in the network for a connectivity of 89.61799913465698
+The specie mola_mola has 20393 total genes and 1850610 total links in the network for a connectivity of 90.74731525523464
+The specie pygocentrus_nattereri has 23221 total genes and 2037628 total links in the network for a connectivity of 87.74936479910426
+The specie scleropages_formosus has 21797 total genes and 1965815 total links in the network for a connectivity of 90.18741111162086
+Species with the most important gene number : 
+macaca_fascicularis, gene number : 27865
+pan_paniscus, gene number : 27742
+pan_troglodytes, gene number : 29180
+Species with the most important link number : 
+astatotilapia_calliptera, link number : 2212679
+maylandia_zebra, link number : 2250544
+pan_troglodytes, link number : 2133778
+Species with the least important gene number : 
+cavia_aperea, gene number : 14311
+gallus_gallus, gene number : 15394
+eptatretus_burgeri, gene number : 10682
+Species with the least important link number : 
+cavia_aperea, link number : 1425333
+gallus_gallus, link number : 1522544
+eptatretus_burgeri, link number : 1151088
+Average gene number per specie : 21391.425742574258
+Average link number per specie : 1904441.3465346536
+Statistics for all genes in the network :
+The average connectivity for each gene in the network is 89.0282569031545
+The max connection in the gene network is 1861. This value is found for 1 genes (4.628485365192124e-07% of genes.)

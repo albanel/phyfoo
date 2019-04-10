@@ -1,0 +1,15 @@
+Test cliques : je donne exactement le même fichier en input pour networkx et quick_clique, les deux programmes donnent exactement les deux même cliques.
+
+Pourquoi ne marchait pas avant : python3 et fonction networkx upgradé ? Ou alors pour quick_clique les liens doivent être stockés deux fois (si 1,2 est dans le fichier, 2,1 doit s'y trouver aussi) peut être que cela affecte les résultats de networkx. Autre possibilité : histoire de dictionnaire qui fait le lien entre chaque gene_id et un entier pour quick_clique. Ou souci de code : input différent.
+
+Cela est testé par le script find_clique.py qui compare les résultats de networkx et quick_cliques.
+
+
+Hypothèse 1 : liens doubles affectent le résultat. Normalement non car networkx ignore gentiment les liens déjà présents. Tester quand même.
+Effectivement résultats exactement les mêmes, networkx ignore les doublons.
+
+Regarder le script qui fait tout (retrieve_clique.py).
+
+Finalement soucis réglés, quick-clique et networkx donnent exactement les mêmes résultats.
+
+Le script fonctionne pour calculer toutes les cliques.

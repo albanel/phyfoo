@@ -1,0 +1,5 @@
+Reste du stage : 
+
+- Finaliser le calcul des cliques, voir pourquoi ça donne des résultats différentes
+
+- Réimplémenter le script json faster etc en orienté object et pour qu'il puisse gérer le global

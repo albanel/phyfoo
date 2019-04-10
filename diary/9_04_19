@@ -1,0 +1,5 @@
+Script pour retrouver les types de lien (o2o, o2m ou m2m) à partir de fichier homolink ou global_homolink.
+Visiblement uniquement o2o dans le non global, et les trois dans le global.
+Du coup revoir la manière dont global_homolink est créé (pas uniquement o2m / m2m ?) 
+Beug dans le programme, du au global id / gene_id, certains genes dans global non retrouvés dans l'un ou l'autre.
+Voir différence gene_id / global_id dans current_gene.

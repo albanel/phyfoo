@@ -1,0 +1,8 @@
+1er avril 2019 :
+
+Tester si quick_cliques va bien fonctionner. Format de fichier a l'air de fonctionner, avec nombre de noeuds au total, ligne d'après nombre de liens*2, puis ensuite sur chaque ligne chaque lien avec noeud 1 , noeud 2 séparés par une virgule. Les liens doivent exister en double. NB : les noeuds doivent être représentés par des nombres entiers de 0 à nbre_de_noeuds-1. Il faut donc créer un dictionnaire de correspondance entre chaque gene_id et un nombre entier correspondant. Le script node_to_id.py s'occupe de traiter entièrement le fichier pour en faire un input pour quick_clique. 
+A vérifier : le format de sortie des cliques est-il exploitable pour la suite ? Le dico de correspondance suffira-t-il ? Moyen de conserver les cliques dans les paramètres ?
+Résultat : 314 secondes pour 3 algos (un ne fonctionne pas, voir pourquoi).
+171852 cliques ont été retrouvées pour homolink non-global.
+Test impression des cliques : attention au dev/null dans le fichier test.sh. Marche bien. Faire en sorte d'enregistrer le dico de correspondance à réutiliser ensuite.
+Test avec global_homolink : crée un fichier de plusieurs giga, attention au stockage.

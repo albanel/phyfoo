@@ -1,0 +1,10 @@
+Aujourd'hui phase 2 de retrieve clique, sur un seul dixième de clique et sur une seule clique (changer cela dans le fichier retrieveclique et dans le fichier nodrmaa pour rétablir les boucles).
+
+Fichiers à modifier pour executer quick_clique : latest.conf pour avoir accès au chemin de quick_clique ainsi que retrieveClique2.py. Attention au "make" de quick_clique.
+
+Certains fichiers sont à modifier afin que quick-cliques fonctionne bien : dans makefile, activer l'option "printOneByOne" sinon les cliques ne s'impriment pas. Tools.cpp : commenter les lignes qui impriment le nombre de cliques + qui imprime le nom de l'algo. 
+
+Lignes à commenter : 
+//fprintf(stderr, "%s: ", pAlgorithm->GetName().c_str());
+//fflush(stderr);
+

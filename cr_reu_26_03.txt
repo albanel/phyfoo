@@ -17,6 +17,6 @@ Réunion du 26 mars :
 A faire : 
 
 - Continuer les stats sur le type de relation, et les stats par espèce.
-- Faire un script qui génère toutes les stats : faut-il filtrer les données ou non ? Premier "délivrable" du rapport.
+- Faire un script qui génère toutes les stats, propre et commenté : faut-il filtrer les données ou non ? Premier "délivrable" du rapport.
 - Réfléchir au nouveau calcul des cliques avec graphtools ; tester sur VM, puis singularity sur le cluster (virtualEnv ?).
 - Doc Ensembl : comment sont gérées les données ?

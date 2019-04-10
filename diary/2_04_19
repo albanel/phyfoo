@@ -1,0 +1,14 @@
+2 / 04 / 19 :
+
+Le script treat_before_quick_clique.py permet de traiter les fichiers sql homolink afin qu'ils soient lisibles par quick_cliques.
+Test de global sur le cluster ; voir pour le stockage. Paralléliser par composante connexe : plus rapide ? Insérer dans la DB puis supprimer pour régler le souci du stockage ?
+
+Reprogrammer le script retrieveClique
+
+Phase 1 (déjà implémentée, python) : écrire les component_id dans un fichier argument.
+
+Phase 2 (rapide à refaire car implémentée en partie, python) : écrire les liens présents dans un fichier séparé, un par composante connexe + prétraitement qui consite à remplacer les identifiants de gènes par des nombres entiers de 0 à nbre de gènes-1. Script RetrieveClique.py à modifier. 
+
+Phase 3 (à faire entièrement, bash) : Parallélisation pour chaque fichier de liens par composante connexe, on calcul les cliques avec quick-cliques. Les insérer sans les stocker ?
+
+Phase 4 (à faire entièrement, python) : Pour chaque fichier clique, on réconstitue les gene_id avec le dico puis on les insère dans la table current_(global_)clique_element.     
