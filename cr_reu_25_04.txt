@@ -1,0 +1,15 @@
+Pour le fichier "retrieve_clique.py" on peut mettre argument non seulement le true et false pour "calcul" et "insertion", mais aussi un argument pour supprimer les cliques correspondant à la colonne de "job_id" lorsqu'on a une erreur pour ce job_id précis. 
+
+Suite du projet :
+Pour le global, on pourrait mettre davantage d'espèces secondaires afin d'avoir le même nombre de cliques à la fin par rapport au réseau non global.
+Pour les requêtes en mode global, il faudra faire des jointures avec la table group_id_to_gene_id. 
+
+Une autre idée serait de créer des cliques et des supercliques selon les liens d'orthologie qui caractérisent les noeuds.
+
+Plusieurs cliques peuvent-elles avoir le même group_id ?
+
+Si on utilisait les composantes connexes et non les cliques : il faudrait utiliser les algos de parcours comme ceux que j'ai regardés au début du stage. Les voisinages des gènes seraient à prendre en compte selon l'espèce.
+
+Une autre idée serait de filtre au préalable la table clique sur chaque scan (chaque motif dTFBS).
+
+En résumé,l'objectif du stage est entre autres de rajouter les group_id en parallèle des cliques.

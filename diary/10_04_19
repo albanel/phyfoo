@@ -4,7 +4,6 @@ Pourquoi ne marchait pas avant : python3 et fonction networkx upgradé ? Ou alor
 
 Cela est testé par le script find_clique.py qui compare les résultats de networkx et quick_cliques.
 
-
 Hypothèse 1 : liens doubles affectent le résultat. Normalement non car networkx ignore gentiment les liens déjà présents. Tester quand même.
 Effectivement résultats exactement les mêmes, networkx ignore les doublons.
 

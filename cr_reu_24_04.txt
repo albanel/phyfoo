@@ -1,0 +1,19 @@
+Différents jobs se tuent mais pas grave, juste 5 jobs sur 100 pour le moment. 
+Solutions :
+	- mettre plein de print pour debuguer un peu partout
+	- ne lancer que sur des noeuds qui ont + de x RAM (memtot)
+
+Améliorer la reprise après erreur des jobs ; voir si ceux qui ont planté sont récupérables (insert ignore ?). Sinon, la meilleure solution est de calculer toutes les cliques et les mettre dans un fichier par composante connexe, puis d'insérer chaque fichier ensuite (load data etc...). Faire par exemple un mode calcul et un mode insertion séparés.
+
+Mais avec autant de cliques, est-ce vraiment pertinent de continuer cette voie ?
+
+Pour les 50 meilleurs gènes : mettre une clé json en argument pour le nombre de gènes (oui ou non on veut les afficher)
+
+Le meilleur hit pourrait être calculé au préalable dans la DB puisque très long. Souci de performances de façon générale pour ce script.
+
+Pour le rapport de stage : 
+
+- Parler de l'architecture de l'application
+- La structure de base + améliorations permettent d'executer de nombreux algos différents sur cette base pour en retirer des infos pertinentes et intéressantes
+- Limites et perspectives => utilisations des composantes connexes, l'idéal serait d'avoir la main sur les paramètres qui ont permis le calcul de l'homologie des gènes
+- L'interface

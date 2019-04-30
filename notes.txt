@@ -82,40 +82,40 @@ dossier "CLGLOBAL" comme pour les autres jobs.
 - Calcul des cliques
 
 Etant donné le temps très long mis pour le calcul des cliques pour le global notamment, le calcul des cliques a été reprogrammé avec un outil nommé "quick cliques", codé en C++.
+Script à appeler au début de Build_Orthocis.py : script/DrmaaScript_RetrieveClique2.py
 Pour cela, pour chaque composante connexe :
 1) Les noeuds et liens sont téléchargés dans la DB
 2) Ils sont écrits dans un fichier
-3) Le fichier est transformé en un format fichier spécifique nécessaire à quick cliques : un lien par ligne séparés par une virgule, chaque noeud étant un entier positif dont la valeur va de 0 à nbre de noeuds -1. Un dictionnaire dans le programme se charge de la transformation. Deux lignes en tête de fichier sont également nécessaires : le nombre de noeuds puis le nombre de liens dans le fichier. Tous les liens doivent être stockés en double.
-4) Ce fichier est envoyé en input à quick_clique, dont le répertoire doit être indiqué dans le fichier conf (quick_clique_dir). Un script bash est ainsi créé pour chaque composante connexe.
-5) Le fichier output de quick clique est récupéré, puis il est lu (les deux premières lignes, informatives, sont ignorées) et décodé pour retrouver les gene_id.
-6) Le reste du programme est identique, insertion dans la DB. 
+3) Le fichier est transformé en un format fichier spécifique nécessaire à quick cliques : un lien par ligne séparés par une virgule, chaque noeud étant un entier positif dont la valeur va de 0 à nbre de noeuds -1. Un dictionnaire dans le programme se charge de la transformation. Deux lignes en tête de fichier sont également nécessaires : le nombre de noeuds puis le nombre de liens dans le fichier (nombre en lignes). Tous les liens doivent être stockés en double.
+4) Ce fichier est envoyé en input à quick_clique, dont le répertoire doit être indiqué dans le fichier conf (quick_clique_dir). Un script bash est ainsi créé et exécuté pour chaque composante connexe.
+Si l'option insertion est activée :
+5) Le fichier output de quick clique est récupéré, puis il est lu (les deux premières lignes, informatives, sont ignorées) et décodé pour retrouver les gene_id. Chaque clique est ajoutée à une liste de cliques. Pour chaque clique de cette liste, on va créer la ligne à insérer dans la DB, avec le gène pour la colonne de l'espèce si elle est représentée, et "NULL" sinon. La ligne est écrite dans un fichier à insérer. Dans la version précédente pour chaque clique les lignes étaient insérées les unes après les autres, mais l'utilisation du load data local infile permet d'accélérer très fortement le calcul des cliques : on passe de 2 semaines de calcul à quelques heures seulement.
+6) Le fichier du job_id est inséré dans la DB. Notons que le job_id est inséré également pour pouvoir supprimer facilement ces lignes en cas d'erreur.
+Attention si on télécharge quick_clique directement depuis git : certaines
+modifications doivent être apportés au code C++ car certaines infos sont
+dirigés vers la sortie erreur par le programme, et ainsi vont dans le fichier
+erreur qui est scanné et qui provoque l'arrêt du job s'il contient quoique ce
+soit. 
+Modifications à apporter après avoir téléchargé quick_clique : 
+a) Dans le fichier makefile, l'option "printOneByOne" doit être activée sinon
+les cliques ne s'impriment pas.
+b) Tools.cpp (dans src) : certaines lignes permettent d'imprimer (dans la
+sortie erreur) le nombre de cliques et le nom de l'algo utilisé. Ligne à
+commenter : //fprintf(stderr, "%s: ", pAlgorithm->GetName().c_str()); et
+//fflush(stderr); pour le nom de l'algo
 
+//fprintf(stderr, "%ld maximal cliques, ", cliqueCount);
+//fprintf(stderr, "in %f seconds\n",
+//(double)(end-start)/(double)(CLOCKS_PER_SEC));
+pour le nombre de cliques.
 
+Modification de la fonction fillCliquesTable + création de la fonction computeCliques :
+Les deux fonctions sont les mêmes sauf que dans le fichier arg, un booléen est noté en plus, False pour fillCliquesTable et True pour computeCliques. Ce booléen indique au fichier RetrieveClique.py s'il doit calculer les cliques ou les insérer dans la DB.
 
+La variable idxcount était globale avant pour pouvoir incrémenter tous les jobs. Mais cela empêchait le fait de pouvoir aller dans le bon directory correspondant puisque la variable s'incrémentait. Par exemple, le calcul des cliques pour le job 1 se faisait dans le dir 1. Mais l'insertion se faisait à partir du dir 2, vide puisque le fichier se trouvait dans le dir 1.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Une fois que la table est créée, on ajoute une colonne auto_increment
+clique_id, comme pour la version précédente mais cette fois-ci à la fin.
 
 
 

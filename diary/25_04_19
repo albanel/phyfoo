@@ -1,0 +1,3 @@
+Modifications du fichier drmaa_retrieve_clique :
+
+D'abord la fonction create_clique_table a été modifiée afin de créer la colonne "clique_job_id" à la place de "clique_id". Cette dernière colonne sera ajoutée à la toute fin.

@@ -1,0 +1,8 @@
+- Il faudrait voir si le calcul des cliques n'est pas exponentiel
+- L'algo d'orthocis2 se divise en 3 parties majeures : contruction de la DB, scans de motifs, lecture de la DB et calcul selon l'utilisateur
+- Reste à faire script json_faster à comprendre, tester, mettre en orienté objet puis y intégrer le global. Le script prend en entrée un fichier json d'arguments et en renvoie un. Sur le serveur, les options, gérées en javascript, sont issues du même schéma que ce fichier
+- 2 modes existent sur le serveur (REST : input jason output jason) : le monde count(infos sur les gènes des espèces sélectionnées) et le mode results qui donne les résultats d'orthologie.
+- Plus on met d'espèces, moins on a de cliques, mais plus elles ont un sens biologique de conservation
+- Utiliser swagger.io pour voir les interfaces : un navigateur gère l'affichage de html et le javascript qui met à jour l'affichage via html et execute des scripts en arrière-plan.
+- Il serait bien de lister, en mode count, la liste de n (=50 ?) premiers gènes qui respectent les contraintes liées aux cliques et/ou au matching.
+- Le passage en orienté object permettra de mettre moins de paramètres qui sont habituellement mis dans un dico (donc ici autant utiliser des attributs), plus de facilité grâce au return. Le grain de découpage du code en objets dépendra de la logique mais aussi du technique (portée variables, etc). 
