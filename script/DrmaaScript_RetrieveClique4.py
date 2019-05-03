@@ -54,9 +54,15 @@ selectfieldid="gene_id"
 if "global" in sGlobalTag:
                 selectfieldid="global_id"
 
+if "ok_for_compute" in os.listdir(".") :
+	print "Cliques already computed for the job_id "+str(clique_job_id)
 
+if "ok_for_insertion" in os.listdir(".") :
+	print "Cliques already written in the database for the job_id "+str(clique_job_id)
 
-if SInsert == "False" :
+#SInsert = "False"
+
+if SInsert == "False" and "ok_for_compute" not in os.listdir('.') :
 	print "Insert = False. Only compute cliques."
 	decoded_clique_file_name = "total_cliques_for_cc"+str(clique_job_id)
 	decoded_clique_file = open(decoded_clique_file_name,"w")
@@ -190,11 +196,17 @@ if SInsert == "False" :
 			print(sorted(clique))
 		'''
 	decoded_clique_file.close()
-else :
+	ok_for_compute = open("ok_for_compute","w")
+	ok_for_compute.close()
+
+#SInsert = "True"
+
+if SInsert == "True" and "ok_for_insertion" not in os.listdir('.') :
+	sSQL_delete_clique_for_current_job = "DELETE FROM "+sBdDVersion+sGlobalTag+"_clique_element WHERE clique_job_id = "+str(clique_job_id)+" ;"
+	SubmitMySQLCommand(sSQL_delete_clique_for_current_job,host,database,user,pw,db,bHaveMySQLdb,True)
 	print "Insert = True. Clique files will be treated and inserted in the database."
 	if "End.txt" in os.listdir('.') :
 		os.remove("End.txt")
-	
 	target_file = "total_cliques_for_cc"+str(clique_job_id)
 	if target_file not in os.listdir('.') :
 		sys.exit("no clique file to treat for id"+str(clique_job_id))
@@ -206,38 +218,33 @@ else :
 		clique_file = open(target_file,"r")
 		reconsitued_table_file_name = "table_for_job_"+str(clique_job_id)
 		reconsitued_table_file = open(reconsitued_table_file_name,"w")
+		clique_ct = 0
 		for oClique in clique_file :
+			clique_ct += 1
+			oClique = oClique.replace("\n","")
 			oClique = oClique.split(",")
 			specie_to_gene = {}
 			line_to_insert = str(clique_job_id)
-			represented_species = []
 			for gene in oClique :
 				specie_id = gene[0:3]
 				specie_to_gene[specie_id] = gene
-				if specie_id not in represented_species :
-					represented_species.append(specie_id)
 			for column in species_columns :
 				if column[0] != "clique_job_id" :
 					specie_id = column[0].replace('sp','')
-					if specie_id in represented_species :
+					try :
 						line_to_insert += ","+specie_to_gene[specie_id]
-					else :
+					except KeyError :
 						line_to_insert += ",NULL"
 			#print(line_to_insert)
 			reconsitued_table_file.write(line_to_insert+"\n")
+			if clique_ct%100000 == 0 :
+				print "Treated cliques : "+str(clique_ct)
 		reconsitued_table_file.close()
 		clique_file.close()
-		sSQL_load_data = "LOAD DATA LOCAL INFILE '"+reconsitued_table_file_name+"' INTO TABLE " +sBdDVersion+sGlobalTag+"_clique_element FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n';"
-		SubmitMySQLCommand(sSQL_load_data,host,database,user,pw,db,bHaveMySQLdb,True)
-
-'''
-## Check if an error occured, if so, there's something in the error file, so we check the size, if not 0 the cliques for the job are deleted from the table
-
-if os.path.getsize("./job.err") != 0 and delete__table_if_error == True :
-	sSQL_delete_clique_for_current_job = "DELETE FROM TABLE"+sBdDVersion+sGlobalTag+"_clique_element WHERE clique_job_id = "+clique_job_id+" ;"
-	SubmitMySQLCommand(sSQL_delete_clique_for_current_job,host,database,user,pw,db,bHaveMySQLdb,True)
-'''
-
+	#sSQL_load_data = "LOAD DATA LOCAL INFILE '"+reconsitued_table_file_name+"' INTO TABLE " +sBdDVersion+sGlobalTag+"_clique_element FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\n';"
+	#SubmitMySQLCommand(sSQL_load_data,host,database,user,pw,db,bHaveMySQLdb,True)
+	ok_for_insertion = open("ok_for_insertion","w")
+	ok_for_insertion.close()
 
 FILE=open("End.txt","w")
 FILE.close()

@@ -1,0 +1,70 @@
+####################
+#STEP1: download all files from remote lcoations
+##################
+#
+#
+#WARNING : All comments must be preceded by '#' and NO COMMENT after a code line
+
+#DebugFile to set the variables controlling tasks
+
+################## PART I ##################
+#Allow to request the Ensembl database or not
+#IF FALSE, default value is applied to other options of the Part I
+DoRequestEnsembl=false
+#Allow to dowload data requested to Ensembl database
+DoDownload=false
+#Request specifically for generic data of the base
+DoRequestForData=false
+#Request specifically for species data of the base
+DoRequestForSpecies=false
+
+#Request HGNC database
+DoRequestHGNC=false
+
+################## PART II ##################
+#Build the Orthocis database
+#IF FALSE, default value is applied to other options of the Part II
+DoAllbase=false
+#Create name generic tables (they are empty)
+DoGenericTable=false
+#Gunzip and rename the GenomeDb file
+GunzipGenomeDb=false
+#Fill the genomeDb table and persist the data in the workdir folder
+FillTableGenomeDbTable=false
+#Create name specie-dependant tables (they are empty)
+DoSpeciesSpecificTable=false
+#Determine if tables must be fill
+#IF FALSE, FillGenericTable and FillSpecificTable are false to
+FillAutoGenerateTable=false
+#Fill name generic tables
+FillGenericTable=false
+#Fill name specie-dependant tables
+FillSpecificTable=false
+#Fill the homolink table
+FillHomolinkTable=false
+
+################## PART III ##################
+#Search all component connex in ortholog gene relation graph
+#IF FALSE, default value is applied to other options of the Part III
+RetrieveComponentConnex=false
+#Create the component connex table (empty)
+CreateComponentConnexTable=false
+#Fill the component connex table
+FillComponentConnexTable=false
+
+################## PART IV ##################
+#Search all clique in component connex of ortholog gene
+#IF FALSE, default value is applied to other options of the Part IV
+RetrieveClique=true
+#Compute cliques
+ComputeCliques=false
+#Creation of the table in a file and insert
+InsertInCliqueTable=true
+
+################## PART V ##################
+#Build HGNC tables
+BuildHGNCtables=false
+
+################## PART V ##################
+#Create upstream fasta file
+CreateFasta=false
