@@ -89,7 +89,7 @@ Pour cela, pour chaque composante connexe :
 3) Le fichier est transformé en un format fichier spécifique nécessaire à quick cliques : un lien par ligne séparés par une virgule, chaque noeud étant un entier positif dont la valeur va de 0 à nbre de noeuds -1. Un dictionnaire dans le programme se charge de la transformation. Deux lignes en tête de fichier sont également nécessaires : le nombre de noeuds puis le nombre de liens dans le fichier (nombre en lignes). Tous les liens doivent être stockés en double.
 4) Ce fichier est envoyé en input à quick_clique, dont le répertoire doit être indiqué dans le fichier conf (quick_clique_dir). Un script bash est ainsi créé et exécuté pour chaque composante connexe.
 Si l'option insertion est activée :
-5) Le fichier output de quick clique est récupéré, puis il est lu (les deux premières lignes, informatives, sont ignorées) et décodé pour retrouver les gene_id. Chaque clique est ajoutée à une liste de cliques. Pour chaque clique de cette liste, on va créer la ligne à insérer dans la DB, avec le gène pour la colonne de l'espèce si elle est représentée, et "NULL" sinon. La ligne est écrite dans un fichier à insérer. Dans la version précédente pour chaque clique les lignes étaient insérées les unes après les autres, mais l'utilisation du load data local infile permet d'accélérer très fortement le calcul des cliques : on passe de 2 semaines de calcul à quelques heures seulement.
+5) Le fichier output de quick clique est récupéré, puis il est lu (les deux premières lignes, informatives, sont ignorées) et décodé pour retrouver les gene_id. Chaque clique est ajoutée à une liste de cliques. Pour chaque clique de cette liste, on va créer la ligne à insérer dans la DB, avec le gène pour la colonne de l'espèce si elle est représentée, et "NULL" sinon. La ligne est écrite dans un fichier à insérer. Dans la version précédente pour chaque clique les lignes étaient insérées les unes après les autres, mais l'utilisation du load data local infile permet d'accélérer très fortement le calcul des cliques : on passe de 2 semaines de calcul à quelques heures seulement. L'utilisation de quick cliques permet sans doute d'accélérer, mais dans une moindre mesure. A tester cette config avec networkx ?
 6) Le fichier du job_id est inséré dans la DB. Notons que le job_id est inséré également pour pouvoir supprimer facilement ces lignes en cas d'erreur.
 Attention si on télécharge quick_clique directement depuis git : certaines
 modifications doivent être apportés au code C++ car certaines infos sont
@@ -109,13 +109,16 @@ commenter : //fprintf(stderr, "%s: ", pAlgorithm->GetName().c_str()); et
 //(double)(end-start)/(double)(CLOCKS_PER_SEC));
 pour le nombre de cliques.
 
+L'utilisation de quick_cliques est découplée du reste pour le debug, mais il est important que les étape de traitement de fichier et d'insertion dans la DB se fassent dans le même job, ainsi les tables finies s'insèrent dans la DB le temps que les autres s'insèrent, ce qui permet de gagner du temps et d'éviter de saturer la DB.
+
 Modification de la fonction fillCliquesTable + création de la fonction computeCliques :
 Les deux fonctions sont les mêmes sauf que dans le fichier arg, un booléen est noté en plus, False pour fillCliquesTable et True pour computeCliques. Ce booléen indique au fichier RetrieveClique.py s'il doit calculer les cliques ou les insérer dans la DB.
 
 La variable idxcount était globale avant pour pouvoir incrémenter tous les jobs. Mais cela empêchait le fait de pouvoir aller dans le bon directory correspondant puisque la variable s'incrémentait. Par exemple, le calcul des cliques pour le job 1 se faisait dans le dir 1. Mais l'insertion se faisait à partir du dir 2, vide puisque le fichier se trouvait dans le dir 1.
 
-Une fois que la table est créée, on ajoute une colonne auto_increment
-clique_id, comme pour la version précédente mais cette fois-ci à la fin.
+Une fois que la table est créée, on ajoute une colonne auto_increment clique_id, comme pour la version précédente mais cette fois-ci à la fin.
+
+Deux fichiers monitorent le bon fonctionnement du programme RetrieveClique : "ok_for_compute" et "ok_for_insertion". Lorsqu'une partie du programme est finie, le fichier correspondant est créée, et non s'il y a une erreur. Et les parties correspondantes ne se font uniquement si le fichier correspondant n'est pas présent dans le répertoire. Ainsi, les jobs déjà exécutés auront ces fichiers dans le répertoire ne se referont pas inutilement si l'utilisateur relance tout s'il y a une erreur.
 
 
 

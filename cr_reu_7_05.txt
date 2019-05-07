@@ -1,0 +1,9 @@
+- Calcul des cliques : il serait intéressant de trouver un moyen de visualiser les données pour voir notamment de combien de cliques un gènes peut faire partie.
+
+- Le plus urgent : que représente le global_id ? Un seul gène ou un groupe de gènes ? De deux choses l'une : un seul gène et une partie group_id qui permet de déterminer un groupe. Si seconde possibilité, on change le calcul des cliques : valide si tel % des members avec un hit.
+
+- GSS : à réfléchir et formaliser pour ensuite sélectionner les cliques, par exemple sur la moyenne des GSS. Si dans une clique, le GSS est élevé, cela signifie qu'en moyenne les espèces sont proches d'un point de vue de l'homologie. Cela permettrait de filtrer si on a trop de hits, en plus de l'arbre de la vie. Aymeric avait déjà bossé sur un moyen de filtrer selon les séquences FASTA (codé en C++). 
+
+- Si certaines espèces sont écartées, c'est parce que certaines étaient mal structurées ; en effet les composantes connexes par exemple étaient trop grandes.
+
+- Transformer le json en global.

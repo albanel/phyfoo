@@ -1,0 +1,22 @@
+Phase 1 : Préparation via BuildOrthocis
+
+- Filtration de homology_member sur homology. Seuls les members qui sont dans homology seront dans homology_member.
+- On sélectionne le method_id correspondant à 'ENSEMBL_ORTHOLOGUES' dans la table current_method_link. Plus tard, il est utilisé dans le fichier argument des scripts homolink A et B.
+- Préparation du premier fichier argument : on a une liste contenant chaque couple d'espèces, et elle est divisé en un certain nombre de jobs. Chaque sous liste est écrite dans le fichier arguments 1.
+- Préparation du second fichier argument : on a une espèce par ligne cette fois ci.
+- Current_gene, homolink et globalhomolinkstart vidées (car remplies plus tard)
+- Scripts Homolink lancés en TryParallelize (A sur 1, B et C sur 2)
+
+Phase 2 : Les scripts homolink
+
+Homolink A :
+
+
+
+Homolink B :
+
+Homolink C :
+
+- Suppressions des tables temporaires
+
+Phase 3 : Attribution du global_id
