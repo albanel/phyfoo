@@ -3,20 +3,44 @@ Phase 1 : Préparation via BuildOrthocis
 - Filtration de homology_member sur homology. Seuls les members qui sont dans homology seront dans homology_member.
 - On sélectionne le method_id correspondant à 'ENSEMBL_ORTHOLOGUES' dans la table current_method_link. Plus tard, il est utilisé dans le fichier argument des scripts homolink A et B.
 - Préparation du premier fichier argument : on a une liste contenant chaque couple d'espèces, et elle est divisé en un certain nombre de jobs. Chaque sous liste est écrite dans le fichier arguments 1.
-- Préparation du second fichier argument : on a une espèce par ligne cette fois ci.
+- Préparation du second fichier argument  liste des especes.
 - Current_gene, homolink et globalhomolinkstart vidées (car remplies plus tard)
-- Scripts Homolink lancés en TryParallelize (A sur 1, B et C sur 2)
+- Scripts Homolink lancés en TryParallelize B sur 1, A et C sur 2).
 
 Phase 2 : Les scripts homolink
 
-Homolink A :
+Homolink A : lance sur script arg2
 
+Pour chaque espece :
 
+- On cree la table tmp_homolink_build par espece, apres avoir supprime la
+  table si elle existe. 
+- A partir de current_homology_member et current_member, on selectionne les
+  infos stable_id, genome_bd_id, homology_id (jointure sur member_id) ou le genome_id est celui de l'espece a laquelle on s'interesse. Limite 1 car juste le titre des colonnes ?
+- Ajout d'index : ce type de manips permet d'accelerer les requetes mais retarde l'insertion.
+- Ajout de la colonne "ismany" = 0. 
+- Si o2m : ismany=1 si description o2m ou m2m.  
 
-Homolink B :
+Homolink B : lance sur script arg1
+
+Pour chaque couple d'especes :
+
+- On recherche les liens d'homologie dans les tables temporaires qui concernent les deux especes du duo courant. On recherche les genes ayant un homology_id commun dans les deux tables. Ils sont alors inseres l'un en face de l'autre dans current_homolink. 
+- Ces genes sont egalement inseres dans la table current_gene.
+- Si o2m=true, meme chose pour les liens ismany>=1 et insertion dans la table globalhomolinkstart.
 
 Homolink C :
 
-- Suppressions des tables temporaires
+- Suppressions des tables temporaires.
 
 Phase 3 : Attribution du global_id
+
+- Creation d'une liste avec tous les couples de liens dans globalhomolinkstart
+- Creation d'un dictionnaire avec en cle chaque gene, first ou second, et en valeur une liste des genes qui lui sont lies
+- Inversion de ce dernier dictionnaire
+- Si un item a plusieurs clés, cela signifie que ces clés sont liées à la même liste de valeurs et donc que ces clés, ou gènes, auront le même global_id
+- GlobalIdLink est créée, asso entre gene_id et global_id
+- Les valeurs sont ajoutées dans current_gene
+- Importation des données dans global_homolink
+
+

@@ -1,0 +1,13 @@
+- Rapport de stage : orthologie pour consolider la recherche de motifs
+
+- Regarder le papier qu'il ma envoyé pour les grandes lignes du rapport
+
+- Rapport : parler de mes objectifs et différencier avec les objectifs à long terme = in/out
+
+- Creuser du côté des diagrammes UML ou de séquence pour représenter des données
+
+- x premiers gènes de la liste des gènes de l'espèce de référence des cliques qui ont passé les filtres.
+
+- Voir le dico objet final, ajouter une méthode permettant d'avoir un résultat
+
+- Attention : les annotations HGNC ne fonctionnent que pour le non-global, car une clique = gènes orthologues = une seule annotation HGNC. A désactiver pour le global.

@@ -120,6 +120,8 @@ Une fois que la table est créée, on ajoute une colonne auto_increment clique_i
 
 Deux fichiers monitorent le bon fonctionnement du programme RetrieveClique : "ok_for_compute" et "ok_for_insertion". Lorsqu'une partie du programme est finie, le fichier correspondant est créée, et non s'il y a une erreur. Et les parties correspondantes ne se font uniquement si le fichier correspondant n'est pas présent dans le répertoire. Ainsi, les jobs déjà exécutés auront ces fichiers dans le répertoire ne se referont pas inutilement si l'utilisateur relance tout s'il y a une erreur.
 
+- Transformation du script json_faster en global :
+
 
 
 
