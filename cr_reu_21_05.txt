@@ -1,0 +1,13 @@
+- Transformation OO : attention à la mémoire prise pour chaque variable, sinon la mettre à "None" si prend bcp de place, python et return et mémoire ?
+
+- Mettre les paramètres dans un dico
+
+- Requêtes SQL en objet ?
+
+- Valoriser ça dans le rapport : créer des diagrammes soit UML de classe classique, soit use case diagramm, soit séquence (logiciel : MODELIO ou YED)
+
+- Cliques max : faire des tests, pas uniquement cliques maximales, peut être prévu pour s'adapter à tout tyoe d'algos de calcul de cliques
+
+- BioMart Ensembl : lien entre identifiant Ensembl et divers infos
+
+- Fichier debug, if debug=True, print
