@@ -1,0 +1,14 @@
+- Noter soucis performances dans le rapport
+- Importance de l'OO : lisibilité du main
+- Discussion : dans le o2m, on ajoute des gènes
+- Couleur différente des cercles global_id, étapes visuelles, quels sont les gènes qu'on perd ? Schéma sans et avec global, tableau et stats
+- Etapes : scripts + mon travail, où il vient
+- Diagramme de séquences appliqué au pipeline de création de la DB
+- Résultats :
+	1) Pipeline de génération : changements apportés, évolution schéma Ensembl etc
+	2) Implémentation des cliques
+	3) Script de requêtage objet / global
+- Orthology et matching, match = match + ortho, ortho on veut juste garder des gènes présents dans l'espèce secondaire (si on a pas assez de hits) match + ortho il faut qu'en plus ils aient un scan
+- Valeur par défauts de arguments à éventuellement travailler
+- Schéma bio : voisinage du gène, upstream etc
+- Expliquer dans les slides exemples concrets + où intervient mon travail
