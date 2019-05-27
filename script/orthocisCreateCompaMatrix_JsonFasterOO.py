@@ -22,158 +22,33 @@ iHomogeneityLimit=750000
 #HOMOLOGY_SCRIPT_MODE="python"
 HOMOLOGY_SCRIPT_MODE="cpp"
 ########################################################################
-'''
-V30 07/03/2019
-
-V26 15/06/2017
-
-
-Outsourcing HomologyComputingFunction, in order to rewrite these function in C++
-
-V23-2017/12/04
-Don't check homogenity when use Count option
-V22-2017/30/01
-For setup "WorkOnHit: All" & "Homology:No", add a column "Best Pvalue" for each species
-V21-2016/06/09
-False sql request to retrieve the matrix size -> false value for max homogeneity
-V20-2016/03/09
-WebOrthocis can't give jsonFile arg for the moment. So jsonData can be given by a string since a file.
-jsonSpecies and jsonFilter are now merged.
-{Filter:{'GetResult':'1','JobId':'63','WorkOnHit':'all','ScoreFilter':{'ValueMin':'0','ValueMax':'32'},'HomologyFilter':{'MatrixSize':'16','HomologyMin':'0','HomologyMax':'1','HomologyOn':'all','HomologyExceptedPosition':'AbsentValue'}},'SpeciesId':{'RefSpecies':'90','MatchSpecies':'31-125','OrthoSpecies':'AbsentValue','DisplaySpecies':'AbsentValue'}}
-V19-2016/01/27
-Change the data file results column name. Only one column names instead of two
-before make it more easy to be read by R script.
-Add an empty column for each species. The names of the column contain the category
-(ie Ref, Match, Ortho, Display)
-Add the Clique Pvalue...
-V18-2015/12/16
-BUG:
-ATP-binding cassette, sub-family F (GCN20), member 3	ABCF3	protein_coding	28.39	16	ENSGALG00000008480	1e-05	-1764:-1749(1)	TGAACTACAGTGACCA	ENSAPLG00000007131	9e-06	-1565:-1550(1)	TGAACTACAGTGACCA	ENSMGAG00000008981	1.1e-05	-2064:-2049(1)	TGAACTACAGTGACCA	ENSTGUG00000010142	8.9e-06	-2477:-2462(1)	TGAACTACAGTGACCA	ENSFALG00000007964	4.1e-06	-2154:-2139(1)	TGAACTACAGTGACCA	
-This clique is accepted with an homogeneity filter [29,32]. 28.39<29 => BUG!
-This clique is rejected with an homogeneity filter [28,31] and Pvalue Filter 2.1e-05 => BUG2 !
-Bug2: Error in Homology4MultiHits : algo bad designed and make confusion in hits obtained when a maximal homogenity filter was specified
-V17-2015/12/14
-Remove CorrectedInfo from the ResultFile
-GainInfo become the official homogenity index. The old (IdScore) will be done only for information.
-IdScore is no more a criteria to filter results. GainInfo become a criteria to filter results.
-Default GainInfo value : min0, maxZ (with Z: matrix length x2)
-GainInfo will be renamed : HomologyScore
-IdScore will be renamed : ConservationValue. Warning, he is calculated on Excepted position
-V16-2015/10/28
-Added a new column results : CorrectedInfo
-The function GetGainInfo return (GainInfo, CorrectedInfo)
-V15-2015/10/23
-new features : if homogeneous checking, add a column with the sum of
-logo value for the consensus of all hits
-V14-2015/10/20
-remove -o options : now, web interface get args with jsonfile
-- json file 1 : Job&Species arguments
-- json file 2 : Filters arguments
-V13-2015/10/02
-Big Change : only follwing options
-- c : conf file to access to the database (for direct user)
-- h/u/b/p : 4 options to access to the database (for the web interface)
-- a : a file that contains all the arguments by categorie (for a direct user)
-- o : an uniq string that contains all the arguments (for the web interface)
-If -o is present, -a isn't used
-#String options must be builded like this
-# /GetResult/JobId/SpeciesBloc/ValueBloc/IdentityBloc
-#with GetResult = [True or False]
-#with SpeciesBloc = RefSp_OrthoSp1-...-OrthoSpX_MatchSp1-...-MatchSpX_DisplaySp1-...-DisplaySpX
-#with Value = ValueMin_ValueMax
-#with IdentityBloc = IdentityValue_[chain OR group]_[all OR best]_exceptedPosition1-...-exceptedPositionX
-Add a new homogeneity option. The aim is to verify a 75% identity between
-two hits and not for all the group. The identity chain in the group must
-made an component connex.
-Ie: A1-A2-A3-A4-A5 is good if Ax have 75% homology with Ax+1
-A1-A2 A3-A4-A5 is not good because hits form two independant graphe
-V12-2015/09/23
-Add biotype column to the compamatrix (for "protein-coding" information)
-V11-2015/09/16
-Fix bug: if no identityThreshold is defined, tExceptedPosition don't exist
-and crash the code
-V10-2015/08/27
-Fix bug: use of -l option crash because others values aren't defined
-V9-2015/07/17
-Regroup Homogeneity args in 'filter' options for easiest treatment by the
-workflow Interface
-BE CAREFUL! Very bad builded, high probability to crash if the Orthocis
-interface is changed... T_T
-V8-2015/04/29
-Fix a bug concerning homogenity : excluded index was take into account in
-limited case and biaise results.
-V7-2015/04/07
-Add 'Filter' mention in default outputfile title
-Add option singleHit. If true, only the best hit of each gene will be used
-for the Homogeneity computing
-
-From HomogeneousHit_CreateCompaMatrixV4
-_ V4-2015/03/12
-Make homogenity computing on all hits, not just the better of each species
-_ V3-2015/03/11
-Add the FilterValue in defaultName generator
-_ V2-2015/03/09
-identityThresold:PercentValue:Position1-Position2-...-PositionX
-PositionX are position not take in count for the compute of the identity 
-Add an identity score column in the compaMatrixFile
-_ V1-2015/03/06
-New needed options : identityThreshold, percentage of identity required
-for validate a clique of hits.
-Take only the better hit for each species.
-Valide a clique only if there is at least 75% of identity between the
-group of hit, ie if 75% of positions have the same value for each hit
-
-From CreateCompaMatrixV6
-_ V6-2015/03/03
-WARNING: exactResult was bypassed.
-Now, the exactResult option must be present in argFile if an argFile is present
-_ V5-2015/01/20
-Take in count RSAT specificity, who use PValue instead DeltaScore
-Change argument format : different item must be separata by ":" instead ","
-_ V4.2-2014/10/09
-Change separator of coord from "-" to ":" for better lisibility of hit coord [ie -779--764(-1) become -779:-764(-1)]
-V4.1-2014/09/25
-Third filters argument not available on the workflow tools, default bypass added to avoid a crash
-_ V4-2014/08/05
-Replace 0 by 'NA' in score columns. Add column HaveOrtholog for display Species
-filter have a new item = applyToDisplay, that take 0 (false) or 1 (true)
-If -1, Display are not affected by filter, elif 0, Display are affected by filter, elif >0, the first X elements are affected by Filter
-By default, Display are affected by filter
-_ V3
-Add the filter argument ever in this form : minValue,maxValue 
-=> Only hit that are include between min/maxValue are valide
-By default, min=0, max=100
-_ V2
-All options are default configured to "AbsentValue" instead of absent call
-Because it's actually not possible to call this script with different value
-in the workflow"'''
-
 
 class FinalDataStruct:
     """Class 
          related to final results
     """
     
-    def __init__(self,sHost,sDatabase,sUser,sPw,sVersionDb): 
+    def __init__(self, arg): 
 
-        self.sHost  = options.hostName
-	self.sDatabase = options.base
-	self.sUser = options.user
-	self.sPw = options.password
-        self.sVersionDb=sVersionDb
-        self.dSpeciesCount=dict()
+        self.sHost  = arg.sHost
+	self.sDatabase = arg.sDatabase
+	self.sUser = arg.sUser
+	self.sPw = arg.sPw
+        self.sVersionDb = arg.sVersionDb
+        self.dSpeciesCount = dict()
         self.internal_genes = list()        
         self.genes = list()
 
-    def computeGenes(self,limit):
-        if len(self.internal_genes) >0:
-           sSQLcommand="select stable_id,genome_db_id from "+self.sVersionDb+"_gene"
-           sSQLcommand+=" where gene_id in ("+",".join(self.internal_genes)+") limit "+str(limit)+";"
-           print sSQLcommand
-           tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-           for tRows in tSQLtable:
-		sENSid=tRows[0]
-		self.genes.append(sENSid)
+    def computeGenes(self,limit, arg):
+	if len(self.internal_genes) >0:
+		sSQLcommand="select stable_id,genome_db_id from "+self.sVersionDb+"_gene"
+           	sSQLcommand+=" where gene_id in ("+",".join(self.internal_genes)+") limit "+str(limit)+";"
+           	print sSQLcommand
+           	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+		query = SQLquery(sSQLcommand, arg)
+           	for tRows in query.result :
+			sENSid=tRows[0]
+			self.genes.append(sENSid)
 
 def exportDataDictHom(dDico,sTempFileName="Output.txt"):
 	FILE=open(sTempFileName,"w")
@@ -259,112 +134,6 @@ def launchHomology4MultiHits(mode,dWorkGene2Data,tExceptedPosition,fIdentityMax)
 		  print str(e)	
 		  return None
 
- 
-'''
-
-if __name__ == "__main__":	
-	sAbsentValue="AbsentValue"
-	sregionClause=" "
-	########################################################################
-	#----------------------- Internal Debug --------------------------------
-	bDebug=False
-	if bDebug:
-		sDebugTarget="14200000008480"
-		print "\\DEBUG\tsDebugTarget:\t"+sDebugTarget
-	#----------------------- Internal Debug --------------------------------
-	########################################################################
-	#Options
-	parser = OptionParser(conflict_handler="resolve") #resolve : the default -h/--help option is disabled in favor of -h/--hostname
-	#unused char : g-i-n-q-s-w-x-y-z
-	parser.add_option("-c","--conf", dest="conf")
-	parser.add_option("-h","--hostName", dest="hostName")
-	parser.add_option("-u","--user", dest="user")
-	parser.add_option("-b","--base", dest="base")
-	parser.add_option("-p","--password", dest="password")
-
-	parser.add_option("-a","--argFile", dest="argFile")
-	parser.add_option("-j","--jsonFilePath", dest="jsonFilePath")
-	parser.add_option("-s","--stringJsonData", dest="stringJsonData")
-
-	(options, args) = parser.parse_args()
-
-	conffile=options.conf
-	bHaveConfFile=True
-	if not conffile:
-		bHaveConfFile=False
-
-		sHost  = options.hostName
-		sDatabase = options.base
-		sUser = options.user
-		sPw = options.password
-		if not sHost:
-			sys.exit("Error : no database login hostName -h  defined, process broken")
-		if not sDatabase:
-			sys.exit("Error : no database login baseName -b  defined, process broken")
-		if not sUser:
-			sys.exit("Error : no database login user -u  defined, process broken")
-		if not sPw:
-			sys.exit("Error : no database login password -p  defined, process broken")
-
-
-
-
-	sArgFile=options.argFile
-	bHaveArgFile=True
-	bHaveJsonFile=False
-	if not sArgFile:
-		bHaveArgFile=False
-		sJsonFilePath=options.jsonFilePath
-		if not sJsonFilePath:
-			bHaveJsonFile=False
-			sJsonStringData=options.stringJsonData
-			if not sJsonStringData:
-				sys.exit("Error : no Options -a or -j or -s defined, process broken")
-	
-	########################################################################
-	#CONSTANT
-	iStepCount=1
-	sVersionDb="current"
-	sJsonOutputName="countOO.json"
-	sOptionInternalItemSeparator="-"
-
-	sJsonKeySpeciesId="SpeciesId"
-	sJsonKeyRefSpecies="RefSpecies"
-	sJsonKeyMatchSpecies="MatchSpecies"
-	sJsonKeyOrthoSpecies="OrthoSpecies"
-	sJsonKeyDisplaySpecies="DisplaySpecies"
-
-	sJsonKeyFilter="Filter"
-	sJsonKeyGetResult="GetResult"
-	sJsonKeyJobId="JobId"
-
-	sJsonToolConf="toolconf"
-	sJsonWorkOnHit="WorkOnAllHit"
-	#sJsonKeyScoreFilter="ScoreFilter"
-	sJsonKeyValueMin="ValueMin"
-	sJsonKeyValueMax="ValueMax"
-	sJsonKeyHomologyFilter="HomologyFilter"
-	sJsonKeyHomologyOn="HomologyOn"
-	#sJsonKeyMatrixSize="MatrixSize"
-	sJsonKeyHomologyMin="HomologyMin"
-	sJsonKeyHomologyMax="HomologyMax"
-	sJsonKeyHomologyExceptedPosition="exceptedPosition"
-	sJsonKeyRegion="scanRegion"
-	 
-
-	#sJsonKeyResearchSpace="researchSpace"
-	########################################################################
-	#SQL param
-	if bHaveConfFile:
-		oConfig =populateGeneralConf(conffile)
-		sHost  = oConfig.get('host');
-		sDatabase = oConfig.get('database');
-		sUser = oConfig.get('user');
-		sPw = oConfig.get('pw');
-
-
-	finalRes = FinalDataStruct(sHost,sDatabase,sUser,sPw,sVersionDb)
-'''
 
 ########################################################################
 #Class
@@ -484,6 +253,8 @@ class Arguments :
 		self.parser = parser
 
 		self.options = options
+		
+		self.sAbsentValue = "AbsentValue"
 
 	def which_varsource(self, options) :
 		options = self.options
@@ -508,10 +279,10 @@ class Arguments :
 		#check si on est en mode chaine, conffile ou path
 	def add_arguments(self, source) :
 		#selon la variable de check, lis et charge les arguments en consequence (etape de domain=1)
-		sRegion=None
+		self.sRegion=None
 		if source == self.ArgFile :
 			oArgs =CustomConfig(sArgFile)
-			sGetResult=oArgs.get(sJsonKeyGetResult)
+			self.sGetResult=oArgs.get(sJsonKeyGetResult)
 			sJobId=oArgs.get(sJsonKeyJobId);
 		
 			sRefSpecies=oArgs.get(sJsonKeyRefSpecies);
@@ -528,7 +299,7 @@ class Arguments :
 			sIdentityMax=oArgs.get(sJsonKeyHomologyMax)
 			sSingleHitAnalysis=oArgs.get(sJsonWorkOnHit)
 			sExceptedPosition=oArgs.get(sJsonKeyHomologyExceptedPosition)
-			sRegion=oArgs.get(sJsonKeyRegion)	
+			self.sRegion=oArgs.get(sJsonKeyRegion)	
 
 		elif source == self.JsonPath :
 			dJsonData=json.load(open(sSpeciesJsonPath))
@@ -536,21 +307,21 @@ class Arguments :
 			sJsonStringData=self.JsonString.replace("'","\"")
 			dJsonData=json.loads(sJsonStringData)
 		print dJsonData
-		sGetResult=str(dJsonData[self.sJsonKeyFilter][self.sJsonKeyGetResult])
+		self.sGetResult=str(dJsonData[self.sJsonKeyFilter][self.sJsonKeyGetResult])
 		self.sJobId=str(dJsonData[self.sJsonKeyFilter][self.sJsonKeyJobId])
 	
-		sRefSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyRefSpecies])
-		sMatchSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyMatchSpecies])
-		sOrthoSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyOrthoSpecies])
-		sDisplaySpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyDisplaySpecies])
+		self.sRefSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyRefSpecies])
+		self.sMatchSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyMatchSpecies])
+		self.sOrthoSpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyOrthoSpecies])
+		self.sDisplaySpecies=str(dJsonData[self.sJsonKeySpeciesId][self.sJsonKeyDisplaySpecies])
 	
-		sSingleHitAnalysis=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonWorkOnHit])
-		sScoreValueMin=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyValueMin])
+		self.sSingleHitAnalysis=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonWorkOnHit])
+		self.sScoreValueMin=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyValueMin])
 		#self.otherGenes = otherGenes
 		#self.otherGenes = otherGenes
-		sScoreValueMax=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyValueMax])
+		self.sScoreValueMax=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyValueMax])
 		#Hack-> Json = Web interface = homology ever checked during script processing
-		sIdentityFilter=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyHomologyFilter])
+		self.sIdentityFilter=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyHomologyFilter])
 		
 		#print("@@"+str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyFilter]))   
 		#sIdentityFilter="True"
@@ -558,16 +329,16 @@ class Arguments :
 		sIdentityMin=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyHomologyMin])
 		sIdentityMax=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyHomologyMax])
 		sExceptedPosition=str(dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyHomologyExceptedPosition])
-		sRegion=dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyRegion]
+		self.sRegion=dJsonData[self.sJsonKeyFilter][self.sJsonToolConf][self.sJsonKeyRegion]
 	
-		if sRegion is not None :
+		if self.sRegion is not None :
 	
-			if sRegion=='upstream':
-				sregionClause=" and region=1 "
-			if sRegion=='genefrag':
-				sregionClause=" and region=2 "
-			if sRegion=='upstream+genefrag':
-				sregionClause=" and region in (1,2)"
+			if self.sRegion=='upstream':
+				self.sregionClause=" and region=1 "
+			if self.sRegion=='genefrag':
+				self.sregionClause=" and region=2 "
+			if self.sRegion=='upstream+genefrag':
+				self.sregionClause=" and region in (1,2)"
 
 	def add_database_parameters(self) :
 	
@@ -597,52 +368,52 @@ class Arguments :
 	def check_validity(self) :
 		#verifie si les options sont valides
 		try:
-			int(sJobId)
+			int(self.sJobId)
 		except:
 			exit("Error : No JobId defined, process broken")
 
-		print sGetResult 
+		print self.sGetResult
 
-		if sGetResult.lower()=="true" or sGetResult=="1":
-			bGetResult=True
+		if self.sGetResult.lower()=="true" or self.sGetResult=="1":
+			self.bGetResult=True
 			print "do get result"
-		elif sGetResult.lower()=="false" or sGetResult=="0" or sGetResult==sAbsentValue:
-			bGetResult=False
+		elif self.sGetResult.lower()=="false" or self.sGetResult=="0" or self.sGetResult==sAbsentValue:
+			self.bGetResult=False
 			print "do count"
 		else:
 			exit("Error : GetResult option must be a boolean, process broken")
 
-		if sRefSpecies=="":
+		if self.sRefSpecies=="":
 			exit("Error : No RefSpecies defined, process broken")
 		try:
-			int(sRefSpecies)
+			int(self.sRefSpecies)
 		except ValueError:
 			exit("Error : RefSpecies must be defined by integer, process broken")
-		if sMatchSpecies=="":
-			tMatchSpecies=[]
+		if self.sMatchSpecies=="":
+			self.tMatchSpecies=[]
 			print("Warning : no MatchSpecies defined")
 		else:
 			try:
-				tMatchSpecies=sMatchSpecies.split(sOptionInternalItemSeparator)
-				[int(X) for X in tMatchSpecies]
+				self.tMatchSpecies=self.sMatchSpecies.split(self.sOptionInternalItemSeparator)
+				[int(X) for X in self.tMatchSpecies]
 			except ValueError:
 				exit("Error : MatchSpecies must be defined by integer, process broken")
-		if sOrthoSpecies=="":
-			tOrthoSpecies=[]
+		if self.sOrthoSpecies=="":
+			self.tOrthoSpecies=[]
 			print("Warning : no OrthoSpecies defined")
 		else:
 			try:
-				tOrthoSpecies=sOrthoSpecies.split(sOptionInternalItemSeparator)
-				[int(X) for X in tOrthoSpecies]
+				self.tOrthoSpecies=self.sOrthoSpecies.split(self.sOptionInternalItemSeparator)
+				[int(X) for X in self.tOrthoSpecies]
 			except ValueError:
 				exit("Error : OrthoSpecies must be defined by integer, process broken")
-		if sDisplaySpecies=="":
-			tDisplaySpecies=[]
+		if self.sDisplaySpecies=="":
+			self.tDisplaySpecies=[]
 			print("Warning : no DisplaySpecies defined")
 		else:
 			try:
-				tDisplaySpecies=sDisplaySpecies.split(sOptionInternalItemSeparator)
-				[int(X) for X in tDisplaySpecies]
+				self.tDisplaySpecies=self.sDisplaySpecies.split(self.sOptionInternalItemSeparator)
+				[int(X) for X in self.tDisplaySpecies]
 			except ValueError:
 				exit("Error : DisplaySpecies must be defined by integer, process broken")
 
@@ -680,51 +451,51 @@ class Arguments :
 	def concatenate(self) :
 		#concatene toutes les options dans une variable
 		#Concatenate All species in one variable
-		tAllSpecies=[sRefSpecies]+tMatchSpecies+tOrthoSpecies+tDisplaySpecies
-		tCheckedSpecies=[sRefSpecies]+tMatchSpecies
+		self.tAllSpecies=[self.sRefSpecies]+self.tMatchSpecies+self.tOrthoSpecies+self.tDisplaySpecies
+		self.tCheckedSpecies=[self.sRefSpecies]+self.tMatchSpecies
 
-		bApplyScoreFilter=False
+		self.bApplyScoreFilter=False
 		bApplyMinScore=False
 		bApplyMaxScore=False
-		if sScoreValueMin=="":
+		if self.sScoreValueMin=="":
 			sScoreValueMin="0"
-			print("Warning : no DisplaySpecies defined, default value 0 used")
+			print("Warning : no ScoreValueMin defined, default value 0 used")
 		else:
 			try:
-				fMinScore=float(sScoreValueMin)
-				bApplyMinScore=True
-				bApplyScoreFilter=True
+				self.fMinScore=float(self.sScoreValueMin)
+				self.bApplyMinScore=True
+				self.bApplyScoreFilter=True
 			except ValueError:
 				exit("Error : ValueMin must be defined by float, process broken")
-		if sScoreValueMax=="":
-			sScoreValueMax="Nothing"
-			print("Warning : no DisplaySpecies defined, no value used")
+		if self.sScoreValueMax=="":
+			self.sScoreValueMax="Nothing"
+			print("Warning : no ScoreValueMax defined, no value used")
 		else:
 			try:
-				fMaxScore=float(sScoreValueMax)
-				bApplyMaxScore=True
-				bApplyScoreFilter=True
+				self.fMaxScore=float(self.sScoreValueMax)
+				self.bApplyMaxScore=True
+				self.bApplyScoreFilter=True
 			except ValueError:
 				exit("Error : ValueMax must be defined by float, process broken")
 
-		bSingleHitAnalysis=False
-		tExceptedPosition=[]
-		if sSingleHitAnalysis=="all":
+		self.bSingleHitAnalysis=False
+		self.tExceptedPosition=[]
+		if self.sSingleHitAnalysis=="all":
 			print("WorkOnHit option : all (all avalaible hits on a gene are considered)")
-			bSingleHitAnalysis=False
-		elif sSingleHitAnalysis=="best":
+			self.bSingleHitAnalysis=False
+		elif self.sSingleHitAnalysis=="best":
 			print("WorkOnHit option : best (only the best hit on a gene is considered)")
-			bSingleHitAnalysis=True
+			self.bSingleHitAnalysis=True
 		else:
 			exit("Error : WorkOnHit must be defined by 'all' or 'best', process broken")
 
-		bCheckHomogeneous=False
-		if sIdentityFilter=="" or sIdentityFilter.lower()=="false":
+		self.bCheckHomogeneous=False
+		if self.sIdentityFilter=="" or self.sIdentityFilter.lower()=="false":
 			print("Warning : IdentityFilter fixed to False, no homogeneous checking will be made")
-		elif len(tMatchSpecies+tOrthoSpecies+tDisplaySpecies)==0:
+		elif len(self.tMatchSpecies+self.tOrthoSpecies+self.tDisplaySpecies)==0:
 			print("Warning : only one species in input, no homogeneity checking will be made")
 		else:
-			bCheckHomogeneous=True
+			self.bCheckHomogeneous=True
 	
 			#if sMatrixSize=="":
 				#exit("Error : MatrixSize must be defined by integer, process broken")
@@ -734,70 +505,70 @@ class Arguments :
 				#exit("Error : MatrixSize must be defined by integer, process broken")
 	
 			try:
-				fIdentityMin=float(sIdentityMin)
+				self.fIdentityMin=float(sIdentityMin)
 			except ValueError:
 				print("Warning : HomologyMin must be defined by float, default value 0 used")
-				fIdentityMin=0
+				self.fIdentityMin=0
 			try:
-				fIdentityMax=float(sIdentityMax)
+				self.fIdentityMax=float(sIdentityMax)
 			except ValueError:
 				exit("Error : HomologyMax must be defined by float, process broken")
 
-			if sExceptedPosition!="" and sExceptedPosition!=sAbsentValue and sExceptedPosition!="0":
-				tTempExceptedPosition=sExceptedPosition.split(sOptionInternalItemSeparator)
+			if self.sExceptedPosition!="" and self.sExceptedPosition!=sAbsentValue and self.sExceptedPosition!="0":
+				self.tTempExceptedPosition=self.sExceptedPosition.split(self.sOptionInternalItemSeparator)
 				try:
-					tExceptedPosition=[int(X) for X in tTempExceptedPosition]
+					self.tExceptedPosition=[int(X) for X in self.tTempExceptedPosition]
 					#IsInt(tExceptedPosition,"position no take in count for the calcul of identity")
 				except ValueError:
 					exit("Error : ExceptedPosition must be defined by integer, process broken")
 			else:
-				tExceptedPosition=[]	
+				self.tExceptedPosition=[]	
 		
-			iMatrixSizeWithoutExcepted=iMatrixSize-len(tExceptedPosition)
-			fTheoricalIdentityMax=float(iMatrixSizeWithoutExcepted*2)
+			self.iMatrixSizeWithoutExcepted=self.iMatrixSize-len(self.tExceptedPosition)
+			self.fTheoricalIdentityMax=float(self.iMatrixSizeWithoutExcepted*2)
 	
-			if fTheoricalIdentityMax<fIdentityMax:
-				print("Warning : HomologyMax can't be superior than 2x matrix length, default value "+str(fTheoricalIdentityMax)+" used")
-				fIdentityMax=fTheoricalIdentityMax
+			if self.fTheoricalIdentityMax < self.fIdentityMax:
+				print("Warning : HomologyMax can't be superior than 2x matrix length, default value "+str(self.fTheoricalIdentityMax)+" used")
+				self.fIdentityMax=self.fTheoricalIdentityMax
 
 	def result_file_name(self) :
 		#generateur du nom de fichier resultat
 		sDisplayData="NoDisplaySp"
-		if len(tDisplaySpecies)!=0:
-			sDisplayData="DisplaySp"+"-".join(tDisplaySpecies)
+		if len(self.tDisplaySpecies)!=0:
+			sDisplayData="DisplaySp"+"-".join(self.tDisplaySpecies)
 		sOrthoData="NoOrthoSp"
-		if len(tOrthoSpecies)!=0:
-			sOrthoData="OrthoSp"+"-".join(tOrthoSpecies)
+		if len(self.tOrthoSpecies)!=0:
+			sOrthoData="OrthoSp"+"-".join(self.tOrthoSpecies)
 		sMatchData="NoMatchSp"
-		if len(tMatchSpecies)!=0:
-			sMatchData="MatchSp"+"-".join(tMatchSpecies)
-		sRefData="refSp"+sRefSpecies
+		if len(self.tMatchSpecies)!=0:
+			sMatchData="MatchSp"+"-".join(self.tMatchSpecies)
+		sRefData="refSp"+self.sRefSpecies
 
 		sValueData="ValueFilter"
-		if fMinScore!=0:
-			sValueData+="-Min"+sScoreValueMin
-		if sScoreValueMax!="Nothing":
-			sValueData+="-Max"+sScoreValueMax
+		if self.fMinScore!=0:
+			sValueData+="-Min"+self.sScoreValueMin
+		if self.sScoreValueMax!="Nothing":
+			sValueData+="-Max"+self.sScoreValueMax
 		if sValueData=="ValueFilter":
 			sValueData="NoValueFilter"
 
 		sIdentityData="NoIdentityFilter"
-		if bCheckHomogeneous:
-			sIdentityData="IdentityFilter-"+str(fIdentityMin)+"-"+str(fIdentityMax)
+		if self.bCheckHomogeneous:
+			sIdentityData="IdentityFilter-"+str(self.fIdentityMin)+"-"+str(self.fIdentityMax)
 
-		if bSingleHitAnalysis:
+		if self.bSingleHitAnalysis:
 			sIdentityData+="-BestHit"
 		else:
 			sIdentityData+="-AllHit"
-		if len(tExceptedPosition)!=0:
+		if len(self.tExceptedPosition)!=0:
 			sIdentityData+="-ExceptedPosition-"+"-".join(tTempExceptedPosition)
 		else:
 			sIdentityData+="-NoExceptedPosition"
 
 		#sResultFileName="CompaMatrix.tsv"	
-		sResultFileName="CompaMatrix-"+sVersionScript+"-ForJob"+sJobId+"_"+sValueData+"_"+sRegion+"_"+sRefData+"_"+sMatchData+"_"+sOrthoData+"_"+sDisplayData+"_"+sIdentityData
+		self.sResultFileName="CompaMatrix-"+sVersionScript+"-ForJob"+self.sJobId+"_"+sValueData+"_"+self.sRegion+"_"+sRefData+"_"+sMatchData+"_"+sOrthoData+"_"+sDisplayData+"_"+sIdentityData
 
-		print("default result file name used : "+sResultFileName)
+		print("default result file name used : "+self.sResultFileName)
 
 
 class Clique : 
@@ -825,302 +596,35 @@ class Hit :
 
 class SQLquery :
 
-	def __init__(self, cmd) :
-		self.result = SubmitMySQLCommand(cmd,sHost,sDatabase,sUser,sPw)
+	def __init__(self, cmd, oArgument) :
+		self.result = SubmitMySQLCommand(cmd,oArgument.sHost,oArgument.sDatabase,oArgument.sUser,oArgument.sPw)
 
 
-'''
-class SQLquery :
-	def __init__(self, cmd) :
-		self.result = self.execute(cmd,sHost,sDatabase,sUser,sPw)
-		self.cmd = cmd
-		self.host = sHost
-		self.database = sDatabase
-		self.user = sUser
-		self.pw = sPw
-		
+def mainprocess():
 
-	def execute(self) :
-'''		
+	#Load all arguments
 
-########################################################################
-domain=1
-if domain==1:
-###def mainprocess():
+	arg = Arguments() #the arg object will contain all arguments
+	arg.add_constants() #add constants (they never change)
+	arg.which_varsource(arg.options) #which var source is used ? json file, json path or json string ?
+	arg.add_arguments(arg.source) #arguments loaded from previous json data
+	arg.add_database_parameters() #load SQL parameters
+	arg.check_validity() #check if arguments are valid
+	arg.concatenate() #concatenate all arguments
+	arg.result_file_name() #create output_file_name (for result mode)
 
-	'''
-	#load variable from argFile or from OptionString
+	print "Arguments loaded"
 
-	sRegion=None
-	if bHaveArgFile:
-		oArgs =CustomConfig(sArgFile)
-		sGetResult=oArgs.get(sJsonKeyGetResult)
-		sJobId=oArgs.get(sJsonKeyJobId);
-	
-		sRefSpecies=oArgs.get(sJsonKeyRefSpecies);
-		sMatchSpecies=oArgs.get(sJsonKeyMatchSpecies);
-		sOrthoSpecies=oArgs.get(sJsonKeyOrthoSpecies);
-		sDisplaySpecies=oArgs.get(sJsonKeyDisplaySpecies);
-	
-		sScoreValueMin=oArgs.get(sJsonKeyValueMin);
-		sScoreValueMax=oArgs.get(sJsonKeyValueMax);
-	
-		sIdentityFilter=oArgs.get(sJsonKeyHomologyFilter)
-		#sMatrixSize=oArgs.get(sJsonKeyMatrixSize)
-		sIdentityMin=oArgs.get(sJsonKeyHomologyMin)
-		sIdentityMax=oArgs.get(sJsonKeyHomologyMax)
-		sSingleHitAnalysis=oArgs.get(sJsonWorkOnHit)
-		sExceptedPosition=oArgs.get(sJsonKeyHomologyExceptedPosition)
-		sRegion=oArgs.get(sJsonKeyRegion)	
-	else: 
-		if bHaveJsonFile:
-			dJsonData=json.load(open(sSpeciesJsonPath))
-		else:
-			sJsonStringData=sJsonStringData.replace("'","\"")
-			dJsonData=json.loads(sJsonStringData)
-			print dJsonData
-		sGetResult=str(dJsonData[sJsonKeyFilter][sJsonKeyGetResult])
-		sJobId=str(dJsonData[sJsonKeyFilter][sJsonKeyJobId])
-	
-		sRefSpecies=str(dJsonData[sJsonKeySpeciesId][sJsonKeyRefSpecies])
-		sMatchSpecies=str(dJsonData[sJsonKeySpeciesId][sJsonKeyMatchSpecies])
-		sOrthoSpecies=str(dJsonData[sJsonKeySpeciesId][sJsonKeyOrthoSpecies])
-		sDisplaySpecies=str(dJsonData[sJsonKeySpeciesId][sJsonKeyDisplaySpecies])
-	
-		sSingleHitAnalysis=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonWorkOnHit])
-		sScoreValueMin=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyValueMin])
-		#self.otherGenes = otherGenes
-		#self.otherGenes = otherGenes
-		sScoreValueMax=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyValueMax])
-		#Hack-> Json = Web interface = homology ever checked during script processing
-		sIdentityFilter=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyFilter])
-		
-                #print("@@"+str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyFilter]))   
-                #sIdentityFilter="True"
-		#sMatrixSize=str(dJsonData[sJsonToolConf][sJsonKeyMatrixSize])
-		sIdentityMin=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyMin])
-		sIdentityMax=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyMax])
-		sExceptedPosition=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyHomologyExceptedPosition])
-		sRegion=dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyRegion]
-	
-	if sRegion is not None :
-
-		if sRegion=='upstream':
-			sregionClause=" and region=1 "
-		if sRegion=='genefrag':
-			sregionClause=" and region=2 "
-		if sRegion=='upstream+genefrag':
-			sregionClause=" and region in (1,2)"
-
-		#sResearchSpace=str(dJsonData[sJsonKeyFilter][sJsonToolConf][sJsonKeyResearchSpace])
-	########################################################################
-	#Step0:get matrix size sJsonKeyMatrixSize
-	iStepCount=StepIncrease(iStepCount,"Get matrix size",0)
-
-	sSQLcommand="select motif_id from "+sVersionDb+"_job where job_id="+str(sJobId)+";"
-	print sSQLcommand
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-        if len(tSQLtable)  <= 0:
-            sSQLcommand="select motif_id,job_id from "+sVersionDb+"_job ;" 
-            tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-            print(str(tSQLtable)) 
-            exit("Error : no motif id for sJobId=%s" %(sJobId))
-       
-	sMatrixId=tSQLtable[0][0]
-
-	sSQLcommand="select size from "+sVersionDb+"_motif where motif_id="+sMatrixId+";"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	sMatrixSize=tSQLtable[0][0]
-	iMatrixSize=int(sMatrixSize)
-
-	########################################################################
-	#Check if options are valide	
-	try:
-		int(sJobId)
-	except:
-		exit("Error : No JobId defined, process broken")
-
-	print sGetResult 
-
-	if sGetResult.lower()=="true" or sGetResult=="1":
-		bGetResult=True
-		print "do get result"
-	elif sGetResult.lower()=="false" or sGetResult=="0" or sGetResult==sAbsentValue:
-		bGetResult=False
-		print "do count"
-	else:
-		exit("Error : GetResult option must be a boolean, process broken")
-
-	if sRefSpecies=="":
-		exit("Error : No RefSpecies defined, process broken")
-	try:
-		int(sRefSpecies)
-	except ValueError:
-		exit("Error : RefSpecies must be defined by integer, process broken")
-
-	if sMatchSpecies=="":
-		tMatchSpecies=[]
-		print("Warning : no MatchSpecies defined")
-	else:
-		try:
-			tMatchSpecies=sMatchSpecies.split(sOptionInternalItemSeparator)
-			[int(X) for X in tMatchSpecies]
-		except ValueError:
-			exit("Error : MatchSpecies must be defined by integer, process broken")
-
-	if sOrthoSpecies=="":
-		tOrthoSpecies=[]
-		print("Warning : no OrthoSpecies defined")
-	else:
-		try:
-			tOrthoSpecies=sOrthoSpecies.split(sOptionInternalItemSeparator)
-			[int(X) for X in tOrthoSpecies]
-		except ValueError:
-			exit("Error : OrthoSpecies must be defined by integer, process broken")
-
-	if sDisplaySpecies=="":
-		tDisplaySpecies=[]
-		print("Warning : no DisplaySpecies defined")
-	else:
-		try:
-			tDisplaySpecies=sDisplaySpecies.split(sOptionInternalItemSeparator)
-			[int(X) for X in tDisplaySpecies]
-		except ValueError:
-			exit("Error : DisplaySpecies must be defined by integer, process broken")
-
-	#Concatenate All species in one variable
-	tAllSpecies=[sRefSpecies]+tMatchSpecies+tOrthoSpecies+tDisplaySpecies
-	tCheckedSpecies=[sRefSpecies]+tMatchSpecies
-
-	bApplyScoreFilter=False
-	bApplyMinScore=False
-	bApplyMaxScore=False
-	if sScoreValueMin=="":
-		sScoreValueMin="0"
-		print("Warning : no DisplaySpecies defined, default value 0 used")
-	else:
-		try:
-			fMinScore=float(sScoreValueMin)
-			bApplyMinScore=True
-			bApplyScoreFilter=True
-		except ValueError:
-			exit("Error : ValueMin must be defined by float, process broken")
-	if sScoreValueMax=="":
-		sScoreValueMax="Nothing"
-		print("Warning : no DisplaySpecies defined, no value used")
-	else:
-		try:
-			fMaxScore=float(sScoreValueMax)
-			bApplyMaxScore=True
-			bApplyScoreFilter=True
-		except ValueError:
-			exit("Error : ValueMax must be defined by float, process broken")
-
-	bSingleHitAnalysis=False
-	tExceptedPosition=[]
-	if sSingleHitAnalysis=="all":
-		print("WorkOnHit option : all (all avalaible hits on a gene are considered)")
-		bSingleHitAnalysis=False
-	elif sSingleHitAnalysis=="best":
-		print("WorkOnHit option : best (only the best hit on a gene is considered)")
-		bSingleHitAnalysis=True
-	else:
-		exit("Error : WorkOnHit must be defined by 'all' or 'best', process broken")
-
-	bCheckHomogeneous=False
-	if sIdentityFilter=="" or sIdentityFilter.lower()=="false":
-		print("Warning : IdentityFilter fixed to False, no homogeneous checking will be made")
-	elif len(tMatchSpecies+tOrthoSpecies+tDisplaySpecies)==0:
-		print("Warning : only one species in input, no homogeneity checking will be made")
-	else:
-		bCheckHomogeneous=True
-	
-		#if sMatrixSize=="":
-			#exit("Error : MatrixSize must be defined by integer, process broken")
-		#try:
-			#iMatrixSize=int(sMatrixSize)
-		#except ValueError:
-			#exit("Error : MatrixSize must be defined by integer, process broken")
-	
-		try:
-			fIdentityMin=float(sIdentityMin)
-		except ValueError:
-			print("Warning : HomologyMin must be defined by float, default value 0 used")
-			fIdentityMin=0
-		try:
-			fIdentityMax=float(sIdentityMax)
-		except ValueError:
-			exit("Error : HomologyMax must be defined by float, process broken")
-
-		if sExceptedPosition!="" and sExceptedPosition!=sAbsentValue and sExceptedPosition!="0":
-			tTempExceptedPosition=sExceptedPosition.split(sOptionInternalItemSeparator)
-			try:
-				tExceptedPosition=[int(X) for X in tTempExceptedPosition]
-				#IsInt(tExceptedPosition,"position no take in count for the calcul of identity")
-			except ValueError:
-				exit("Error : ExceptedPosition must be defined by integer, process broken")
-		else:
-			tExceptedPosition=[]	
-		
-		iMatrixSizeWithoutExcepted=iMatrixSize-len(tExceptedPosition)
-		fTheoricalIdentityMax=float(iMatrixSizeWithoutExcepted*2)
-	
-		if fTheoricalIdentityMax<fIdentityMax:
-			print("Warning : HomologyMax can't be superior than 2x matrix length, default value "+str(fTheoricalIdentityMax)+" used")
-			fIdentityMax=fTheoricalIdentityMax
-
-	########################################################################
-	#ResultFile name generator
-	sDisplayData="NoDisplaySp"
-	if len(tDisplaySpecies)!=0:
-		sDisplayData="DisplaySp"+"-".join(tDisplaySpecies)
-	sOrthoData="NoOrthoSp"
-	if len(tOrthoSpecies)!=0:
-		sOrthoData="OrthoSp"+"-".join(tOrthoSpecies)
-	sMatchData="NoMatchSp"
-	if len(tMatchSpecies)!=0:
-		sMatchData="MatchSp"+"-".join(tMatchSpecies)
-	sRefData="refSp"+sRefSpecies
-
-	sValueData="ValueFilter"
-	if fMinScore!=0:
-		sValueData+="-Min"+sScoreValueMin
-	if sScoreValueMax!="Nothing":
-		sValueData+="-Max"+sScoreValueMax
-	if sValueData=="ValueFilter":
-		sValueData="NoValueFilter"
-
-	sIdentityData="NoIdentityFilter"
-	if bCheckHomogeneous:
-		sIdentityData="IdentityFilter-"+str(fIdentityMin)+"-"+str(fIdentityMax)
-
-	if bSingleHitAnalysis:
-		sIdentityData+="-BestHit"
-	else:
-		sIdentityData+="-AllHit"
-	if len(tExceptedPosition)!=0:
-		sIdentityData+="-ExceptedPosition-"+"-".join(tTempExceptedPosition)
-	else:
-		sIdentityData+="-NoExceptedPosition"
-
-	#sResultFileName="CompaMatrix.tsv"	
-	sResultFileName="CompaMatrix-"+sVersionScript+"-ForJob"+sJobId+"_"+sValueData+"_"+sRegion+"_"+sRefData+"_"+sMatchData+"_"+sOrthoData+"_"+sDisplayData+"_"+sIdentityData
-
-	print("default result file name used : "+sResultFileName)
-	'''
-
-
-	arg = Arguments()
-	arg.add_constants()
-	arg.which_varsource(arg.options)
-	arg.add_arguments(arg.source)	
-	arg.add_database_parameters()
+	finalRes = FinalDataStruct(arg)
 
 	########################################################################
 	#Take in count the tool_id (target the good column)
 	sSQLcommand="select Tag from "+arg.sVersionDb+"_job j, "+arg.sVersionDb+"_tool t where j.tool_id=t.tool_id and j.job_id="+arg.sJobId+";"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,arg.sHost,arg.sDatabase,arg.sUser,arg.sPw)
-	sToolColTarget=tSQLtable[0][0]
+	#tSQLtable=SubmitMySQLCommand(sSQLcommand,arg.sHost,arg.sDatabase,arg.sUser,arg.sPw)
+	query = SQLquery(sSQLcommand,arg)
+	#sToolColTarget=tSQLtable[0][0]
+	sToolColTarget = query.result[0][0]
+	
 	'''
 	########################################################################
 	#DEBUG
@@ -1144,13 +648,14 @@ if domain==1:
 	#Step1:retrieve all available species
 	iStepCount=StepIncrease(iStepCount,"Retrieve all species",0)
 	dGenome2Name={}
-	sSQLcommand="select genome_db_id,name from "+sVersionDb+"_genome_db;"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	for tRows in tSQLtable:
+	sSQLcommand="select genome_db_id,name from "+arg.sVersionDb+"_genome_db;"
+	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	query = SQLquery(sSQLcommand,arg)
+	for tRows in query.result :
 		sGenomeId=tRows[0]
 		sSpeciesName=tRows[1]
 
-		if sGenomeId in tAllSpecies:
+		if sGenomeId in arg.tAllSpecies:
 			dGenome2Name[sGenomeId]=sSpeciesName
 
 	#Step2:retrieve all HGNC annotation for clique
@@ -1158,9 +663,10 @@ if domain==1:
 	dClique2HGNC={}
 
         # warning : only for one2one (1 HNGC by clique)
-	sSQLcommand="select clique_id, fullName, shortName from "+sVersionDb+"_HGNC h, "+sVersionDb+"_asso_HGNC_clique a where h.HGNC_id=a.HGNC_id;"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	for tRows in tSQLtable:
+	sSQLcommand="select clique_id, fullName, shortName from "+arg.sVersionDb+"_HGNC h, "+arg.sVersionDb+"_asso_HGNC_clique a where h.HGNC_id=a.HGNC_id;"
+	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	query = SQLquery(sSQLcommand,arg)
+	for tRows in query.result :
 		sCliqueId=tRows[0]
 		sFullName=" ".join(tRows[1:-1])
 		sShortName=tRows[-1]
@@ -1170,9 +676,10 @@ if domain==1:
 	#Step3:retrieve all biotype annotation for clique
 	iStepCount=StepIncrease(iStepCount,"Retrieve all biotype annotation for clique",0)
 	dClique2Biotype={}
-	sSQLcommand="select c.clique_id, t.biotype from "+sVersionDb+"_gene_"+sRefSpecies+" t, "+sVersionDb+"_gene g, "+sVersionDb+"_clique_element c where t.stable_id = g.stable_id and g.gene_id = c.sp"+sRefSpecies+";"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	for tRows in tSQLtable:
+	sSQLcommand="select c.clique_id, t.biotype from "+arg.sVersionDb+"_gene_"+arg.sRefSpecies+" t, "+arg.sVersionDb+"_gene g, "+arg.sVersionDb+"_clique_element c where t.stable_id = g.stable_id and g.gene_id = c.sp"+arg.sRefSpecies+";"
+	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	query = SQLquery(sSQLcommand,arg)
+	for tRows in query.result :
 		sCliqueId=tRows[0]
 		sBiotype=tRows[1]
 
@@ -1230,7 +737,9 @@ if domain==1:
 	
 	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
 
-	query = SQLquery("select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+sVersionDb+"_scan_"+sRefSpecies+" s where job_id="+sJobId+" "+sregionClause+" and s.match=1;")	
+	sSQLcommand = "select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+arg.sVersionDb+"_scan_"+arg.sRefSpecies+" s where job_id="+arg.sJobId+" "+arg.sregionClause+" and s.match=1;"	
+
+	query = SQLquery(sSQLcommand,arg)
 
 	HitDict = {}
 
@@ -1239,12 +748,12 @@ if domain==1:
 		sGeneId=tRows[0]		
 		bAddHit=True
 
-		if bApplyScoreFilter :
-			if bApplyMinScore :
-				if pvalue < fMinScore :
+		if arg.bApplyScoreFilter :
+			if arg.bApplyMinScore :
+				if pvalue < arg.fMinScore :
 					bAddHit=False
-			if bApplyMaxScore :
-				if pvalue > fMaxScore :
+			if arg.bApplyMaxScore :
+				if pvalue > arg.fMaxScore :
 					bAddHit=False
 		#print bAddHit
 		#bSingleHitAnalysis=True
@@ -1256,7 +765,7 @@ if domain==1:
 			strand=tRows[4]
 			hitName=sScan_id+"_"+sGeneId+"_"+start+"_"+end+"_"+seq+"_"+strand+"_"+str(pvalue)
 			hitName=Hit(sScan_id,sGeneId,start,end,seq,strand,pvalue) 
-			if bSingleHitAnalysis :
+			if arg.bSingleHitAnalysis :
 				try :
 					fStoredScore=HitDict[sGeneId][0].pvalue #score of the lone stored hit
 					if hitName.pvalue < fStoredScore :
@@ -1345,12 +854,12 @@ if domain==1:
 	# si firstapparition : sClique_id=Clique(sClique_id,refgene,listofothergenes), clique_list.append(sClique_id)
 	# sinon : for sStoredClique in clique_list : tStoredListOfOtherGene=sStoredClique.ListOfOtherGenes, reste est le meme
 	iStepCount=StepIncrease(iStepCount,"Retrieve all cliques",0)
-	tAvailableColumn= ["sp"+sId for sId in tAllSpecies]
+	tAvailableColumn= ["sp"+sId for sId in arg.tAllSpecies]
 	dCheckInclude={}
-	sSQLcommand="select clique_id,"+",".join(tAvailableColumn)+" from "+sVersionDb+"_clique_element where sp"+sRefSpecies+" is not null;"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	
-	for tRows in tSQLtable:
+	sSQLcommand="select clique_id,"+",".join(tAvailableColumn)+" from "+arg.sVersionDb+"_clique_element where sp"+arg.sRefSpecies+" is not null;"
+	#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	query = SQLquery(sSQLcommand,arg)	
+	for tRows in query.result :
 		sCliqueId=tRows[0]
 		sRefGeneId=tRows[1]
 		tListOfOtherGene=[geneId for geneId in tRows[2:] if geneId!="NULL"]
@@ -1475,21 +984,21 @@ if domain==1:
 				tListOfRepresentedSpecies.append(sSpeciesId)
 		
 			bValidClique=True
-			for sMatchSpecies in tMatchSpecies:
+			for sMatchSpecies in arg.tMatchSpecies:
 				if sMatchSpecies not in tListOfRepresentedSpecies:
 					bValidClique=False
 					try:
 						dLost[sMatchSpecies]+=1
 					except KeyError:
 						dLost[sMatchSpecies]=1
-			for sOrthoSpecies in tOrthoSpecies:
+			for sOrthoSpecies in arg.tOrthoSpecies:
 				if sOrthoSpecies not in tListOfRepresentedSpecies:
 					bValidClique=False
 					try:
 						dLost[sOrthoSpecies]+=1
 					except KeyError:
 						dLost[sOrthoSpecies]=1
-			for sDisplaySpecies in tDisplaySpecies:
+			for sDisplaySpecies in arg.tDisplaySpecies:
 				if not sDisplaySpecies in dDisplay2Ortholog:
 					dDisplay2Ortholog[sDisplaySpecies]={}
 				if sDisplaySpecies in tListOfRepresentedSpecies:
@@ -1562,16 +1071,17 @@ if domain==1:
 
 	iStepCount=StepIncrease(iStepCount,"Retrieve all hits for each species",0)
 	iCount=1
-	sOneTarget=sAbsentValue
+	sOneTarget=arg.sAbsentValue
 	for sSpecies in dGenome2Name.keys():
-		if sSpecies==sRefSpecies:
+		if sSpecies == arg.sRefSpecies:
 			#Already processed
 			continue
 		print str(iCount)+"/"+str(len(dGenome2Name)-1)
 		iCount+=1
-		sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+sVersionDb+"_scan_"+sSpecies+" s where job_id="+sJobId+" "+sregionClause+" and s.match=1;"
-		tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-		for tRows in tSQLtable:
+		sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+arg.sVersionDb+"_scan_"+sSpecies+" s where job_id="+arg.sJobId+" "+arg.sregionClause+" and s.match=1;"
+		#tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+		query = SQLquery(sSQLcommand,arg)
+		for tRows in query.result :
 			sGeneId=tRows[0]
 			pvalue=float(tRows[5])
 
@@ -1581,14 +1091,14 @@ if domain==1:
 
 			bAddHit=True
 
-			if bApplyScoreFilter:
+			if arg.bApplyScoreFilter:
 				#if sSpeciesId in tDisplayToFilter or not sSpeciesId in tDisplaySpecies: 
-				if not sSpeciesId in tDisplaySpecies: 
-					if bApplyMinScore:
-						if fCurrentScore<fMinScore:
+				if not sSpeciesId in arg.tDisplaySpecies: 
+					if arg.bApplyMinScore:
+						if fCurrentScore < arg.fMinScore:
 							bAddHit=False
-					if bApplyMaxScore:
-						if fCurrentScore>fMaxScore:
+					if arg.bApplyMaxScore:
+						if fCurrentScore > arg.fMaxScore:
 							bAddHit=False
 
 			if bAddHit:
@@ -1599,7 +1109,7 @@ if domain==1:
 				strand=tRows[4]	
 				hitName=sScan_id+"_"+sGeneId+"_"+start+"_"+end+"_"+seq+"_"+strand+"_"+str(pvalue)
 				hitName=Hit(sScan_id,sGeneId,start,end,seq,strand,pvalue)
-				if bSingleHitAnalysis:
+				if arg.bSingleHitAnalysis:
 					try:
 						fStoredScore=HitDict[sGeneId][0].pvalue
 						if fCurrentScore < fStoredScore:
@@ -1702,9 +1212,9 @@ if domain==1:
 
 	iStepCount=StepIncrease(iStepCount,"Apply homology filter",0)
 	tUnalyzedGenes=[]
-	if sOneTarget==sAbsentValue:
+	if sOneTarget==arg.sAbsentValue:
 		print("Warning : no valide results, step skipped")
-	elif not bGetResult:
+	elif not arg.bGetResult:
 		print("Warning : Count option activated, no homology tested, step skipped")
                 dClique2Score={}
 	elif bCheckHomogeneous:
@@ -1785,10 +1295,10 @@ if domain==1:
 	argid=dGenome2GeneSample.values()
 	if argid is not None and len(argid)>0:
 	
-	  sSQLcommand="select stable_id,genome_db_id from "+sVersionDb+"_gene where gene_id="+" or gene_id=".join(dGenome2GeneSample.values())+";"
-	  print sSQLcommand
-	  tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	  for tRows in tSQLtable:
+	  sSQLcommand="select stable_id,genome_db_id from "+arg.sVersionDb+"_gene where gene_id="+" or gene_id=".join(dGenome2GeneSample.values())+";"
+	  #tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	  query = SQLquery(sSQLcommand,arg)
+	  for tRows in query.result :
 		sENSid=tRows[0]
 		sENStag=sENSid[:-11]
 		sGenomeId=tRows[1]
@@ -1826,7 +1336,7 @@ if domain==1:
         for sCliqueId in dClique2Gene:
 	  fWorstGlobalPvalue=-1
 	  for sGeneId in dClique2Gene[sCliqueId]:
-		if sGeneId[:-11] in tCheckedSpecies:
+		if sGeneId[:-11] in arg.tCheckedSpecies:
 			#Warning: a gene can have no hit, so no occurences in dGene2Data
 			try:
 				fLocalBestPvalue=1.0
@@ -1902,7 +1412,7 @@ if domain==1:
 			dFinal[sCliqueId]={"HGNC":{"full":dClique2HGNC[sCliqueId]["full"],"short":dClique2HGNC[sCliqueId]["short"]},"Content":{}}
 		except KeyError:
 			dFinal[sCliqueId]={"HGNC":{"full":"no HGNC","short":"no HGNC"},"Content":{}}
-		if bCheckHomogeneous:
+		if arg.bCheckHomogeneous:
 			dFinal[sCliqueId]["Score"]=dClique2Score[sCliqueId]
 		dFinal[sCliqueId]["Pvalue"]=dClique2UniqPvalue[sCliqueId]
 		bValidClique=True
@@ -1917,10 +1427,10 @@ if domain==1:
 					dFinal[sCliqueId]["Content"][sGeneId]=HitDict[sGeneId]
 			except KeyError:
 					sSpeciesId=sGeneId[:-11] #In geneId, the last 11 numbers are the numerical part of ENS id. The part before is the speciesId
-					if sSpeciesId==sRefSpecies:
+					if sSpeciesId==arg.sRefSpecies:
 						bValidClique=False
 						bRefFailure=True
-					elif sSpeciesId in tMatchSpecies:
+					elif sSpeciesId in arg.tMatchSpecies:
 						bValidClique=False
 						tMatchFailure.append(sSpeciesId)
 					else:
@@ -1937,7 +1447,7 @@ if domain==1:
 
 	#Step12:
 	iStepCount=StepIncrease(iStepCount,"Compute the ConservationValue",0)
-	if bSingleHitAnalysis or bCheckHomogeneous:
+	if arg.bSingleHitAnalysis or arg.bCheckHomogeneous:
 		for sCliqueId in dFinal:
 			dFinal[sCliqueId]["ConservationValue"]=GetCommonValue(dFinal[sCliqueId]["Content"],tExceptedPosition,tCheckedSpecies)
 	else:
@@ -2150,7 +1660,7 @@ if domain==1:
 	'''
 	#step13 : OO version
 	iStepCount=StepIncrease(iStepCount,"Write the results",0)
-	if not bGetResult:
+	if not arg.bGetResult:
 		#result = count.json
                 if dLost is None:
                     dLost=dict()
@@ -2158,23 +1668,23 @@ if domain==1:
                     dLost["Heterogeneous"]=None
 		finalRes.dSpeciesCount={"Global":{"cliqueNumber":0,"geneNumber":0,"hitNumber":0,"heterogeneousRejected":dLost["Heterogeneous"]},"Reference":{"geneNumber":0,"hitNumber":0},"MatchSpecies":{},"OrthoSpecies":{},"DisplaySpecies":{}}
 		dSpeciesClassification={}
-		dSpeciesClassification[sRefSpecies]={"type":"Reference","name":dGenome2Name[sRefSpecies]}
-		for sSpeciesId in tMatchSpecies:
+		dSpeciesClassification[arg.sRefSpecies]={"type":"Reference","name":dGenome2Name[arg.sRefSpecies]}
+		for sSpeciesId in arg.tMatchSpecies:
 			dSpeciesClassification[sSpeciesId]={"type":"MatchSpecies","name":dGenome2Name[sSpeciesId]}
 			try:
 				iLostNumber=dLost[sSpeciesId]
 			except KeyError:
 				iLostNumber=0
 			finalRes.dSpeciesCount["MatchSpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0,"lostClique":iLostNumber}
-		for sSpeciesId in tOrthoSpecies:
-			dSpeciesClassification[sSpeciesId]={"type":"OrthoSpecies","name":dGenome2Name[sRefSpecies]}
+		for sSpeciesId in arg.tOrthoSpecies:
+			dSpeciesClassification[sSpeciesId]={"type":"OrthoSpecies","name":dGenome2Name[arg.sRefSpecies]}
 			try:
 				iLostNumber=dLost[sSpeciesId]
 			except KeyError:
 				iLostNumber=0
 			finalRes.dSpeciesCount["OrthoSpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0,"lostClique":iLostNumber}
-		for sSpeciesId in tDisplaySpecies:
-			dSpeciesClassification[sSpeciesId]={"type":"DisplaySpecies","name":dGenome2Name[sRefSpecies]}
+		for sSpeciesId in arg.tDisplaySpecies:
+			dSpeciesClassification[sSpeciesId]={"type":"DisplaySpecies","name":dGenome2Name[arg.sRefSpecies]}
 			finalRes.dSpeciesCount["DisplaySpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0}
 
 		for sCliqueId in dFinal:
@@ -2186,23 +1696,23 @@ if domain==1:
 				sSpeciesName=dGenome2Name[sSpeciesId]
 				iHitNumber=len(dFinal[sCliqueId]["Content"][sGeneId])
 				finalRes.dSpeciesCount["Global"]["hitNumber"]+=iHitNumber
-				if sSpeciesId==sRefSpecies:
+				if sSpeciesId == arg.sRefSpecies:
 					finalRes.dSpeciesCount["Reference"]["geneNumber"]+=1
 					finalRes.dSpeciesCount["Reference"]["hitNumber"]+=iHitNumber
                                         finalRes.internal_genes.append(sGeneId)
-				if sSpeciesId in tMatchSpecies:
+				if sSpeciesId in arg.tMatchSpecies:
 					finalRes.dSpeciesCount["MatchSpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["MatchSpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-				if sSpeciesId in tOrthoSpecies:
+				if sSpeciesId in arg.tOrthoSpecies:
 					finalRes.dSpeciesCount["OrthoSpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["OrthoSpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-				if sSpeciesId in tDisplaySpecies:
+				if sSpeciesId in arg.tDisplaySpecies:
 					finalRes.dSpeciesCount["DisplaySpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["DisplaySpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-                finalRes.computeGenes(200)
+                finalRes.computeGenes(200, arg)
                 finalRes.dSpeciesCount["Reference"]["selected_genes"]=finalRes.genes
-                print("sJsonOutputName"+sJsonOutputName)
-		FILE=open(sJsonOutputName,"w")
+                print("sJsonOutputName"+arg.sJsonOutputName)
+		FILE=open(arg.sJsonOutputName,"w")
 		FILE.write(json.dumps(finalRes.dSpeciesCount, indent=4))
 		FILE.close()
 	else:
@@ -2354,6 +1864,7 @@ if domain==1:
 
 		#Iterer sur le dico result version classe
 
+mainprocess()
 
 ########fix :cleaning temp data
 cmd=["bash","-c", "rm -f ./TempCompa*" ]
