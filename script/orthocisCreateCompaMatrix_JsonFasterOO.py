@@ -199,7 +199,7 @@ def GetCommonValue(dDico,tExcepted,tTargetedSpecies):
 
 #Gestion of the MySQL command execution
 def SubmitMySQLCommand(cmdSql,host,database,user,pw):
-	cmdSql=cmdSql.replace("\n"," ")
+	cmdSql = cmdSql.replace("\n"," ")
 	mysql=["mysql", "--batch", "-u",user+"","-p"+pw,"-h",host+"",database+"","-e","\""+cmdSql+"\""]
 	myssqlTemp=" ".join(mysql)	
  	return ExecuteBashFile(myssqlTemp)
@@ -685,15 +685,16 @@ def mainprocess():
 
 		dClique2Biotype[sCliqueId]=sBiotype
 
-	'''
+	
 	#Step4: retrieve all hits on gene for the jobId
 	#NB: if bSingleHitAnalysis is True, retrieve only the best hit
 	iStepCount=StepIncrease(iStepCount,"Retrieve all hits on ref species",0)
 	dGene2Data={}
 	dGenome2GeneSample={}
-	sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+sVersionDb+"_scan_"+sRefSpecies+" s where job_id="+sJobId+" "+sregionClause+" and s.match=1;"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-	for tRows in tSQLtable:
+	
+	sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+arg.sVersionDb+"_scan_"+arg.sRefSpecies+" s where job_id="+arg.sJobId+" "+arg.sregionClause+" and s.match=1;"
+	query = SQLquery(sSQLcommand,arg)
+	for tRows in query.result :
 		sGeneId=tRows[0]
 		dData={"Start":tRows[1],"End":tRows[2],"Sequence":tRows[3],"Strand":tRows[4],sToolColTarget:tRows[5]}
 		sScanId=tRows[6]
@@ -701,18 +702,18 @@ def mainprocess():
 
 		bAddHit=True
 
-		if bApplyScoreFilter:		
-			if bApplyMinScore:
-				if fCurrentScore<fMinScore:
+		if arg.bApplyScoreFilter:		
+			if arg.bApplyMinScore:
+				if fCurrentScore < arg.fMinScore:
 					bAddHit=False
-			if bApplyMaxScore:
-				if fCurrentScore>fMaxScore:
+			if arg.bApplyMaxScore:
+				if fCurrentScore > arg.fMaxScore:
 					bAddHit=False
-		bSingleHitAnalysis = True
+		#bSingleHitAnalysis = True
 		if bAddHit:
-			if bSingleHitAnalysis:
+			if arg.bSingleHitAnalysis:
 				try:
-					fStoredScore=float(dGene2Data[sGeneId][dGene2Data[sGeneId].keys()[0]][sToolColTarget])
+					fStoredScore = float(dGene2Data[sGeneId][dGene2Data[sGeneId].keys()[0]][sToolColTarget])
 					if fCurrentScore < fStoredScore:
 						dGene2Data[sGeneId]={sScanId:dData}
 				except KeyError:
@@ -788,12 +789,12 @@ def mainprocess():
 	#Step5: retrieve all clique where sRefSpecies have a gene and remove clique that are included in other clique according the species selection
 	#Note:"Try-except" on dictionnary is faster than "if X in [data]-else" in case where len[data]>10000...
 	iStepCount=StepIncrease(iStepCount,"Retrieve all cliques",0)
-	tAvailableColumn= ["sp"+sId for sId in tAllSpecies]
+	tAvailableColumn= ["sp"+sId for sId in arg.tAllSpecies]
 	dCheckInclude={}
-	sSQLcommand="select clique_id,"+",".join(tAvailableColumn)+" from "+sVersionDb+"_clique_element where sp"+sRefSpecies+" is not null;"
-	tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
+	sSQLcommand="select clique_id,"+",".join(tAvailableColumn)+" from "+arg.sVersionDb+"_clique_element where sp"+arg.sRefSpecies+" is not null;"
+	query = SQLquery(sSQLcommand, arg)	
 	
-	for tRows in tSQLtable:
+	for tRows in query.result :
 		sCliqueId=tRows[0]
 		sRefGeneId=tRows[1]
 		tListOfOtherGene=[geneId for geneId in tRows[2:] if geneId!="NULL"]
@@ -918,7 +919,6 @@ def mainprocess():
 				elif bRemoveCurrentClique:
 					bHaveChange=False
 
-
 	'''		
 	#Step6: Check that ortho/matchSpecies have a gene in each clique
 	#		and note if display have or not a ortholog gene
@@ -935,21 +935,21 @@ def mainprocess():
 				tListOfRepresentedSpecies.append(sSpeciesId)
 		
 			bValidClique=True
-			for sMatchSpecies in tMatchSpecies:
+			for sMatchSpecies in arg.tMatchSpecies:
 				if sMatchSpecies not in tListOfRepresentedSpecies:
 					bValidClique=False
 					try:
 						dLost[sMatchSpecies]+=1
 					except KeyError:
 						dLost[sMatchSpecies]=1
-			for sOrthoSpecies in tOrthoSpecies:
+			for sOrthoSpecies in arg.tOrthoSpecies:
 				if sOrthoSpecies not in tListOfRepresentedSpecies:
 					bValidClique=False
 					try:
 						dLost[sOrthoSpecies]+=1
 					except KeyError:
 						dLost[sOrthoSpecies]=1
-			for sDisplaySpecies in tDisplaySpecies:
+			for sDisplaySpecies in arg.tDisplaySpecies:
 				if not sDisplaySpecies in dDisplay2Ortholog:
 					dDisplay2Ortholog[sDisplaySpecies]={}
 				if sDisplaySpecies in tListOfRepresentedSpecies:
@@ -963,7 +963,6 @@ def mainprocess():
 				dbListOfGenes=tuple(tNewListOfGenes)
 				dClique2Gene[sCliqueId]=dbListOfGenes
 
-	print dClique2Gene
 	'''
 	#Step 6 : OO version
 	
@@ -1018,16 +1017,16 @@ def mainprocess():
 	#NB: if bSingleHitAnalysis is True, retrieve only the best hit
 	iStepCount=StepIncrease(iStepCount,"Retrieve all hits for each species",0)
 	iCount=1
-	sOneTarget=sAbsentValue
+	sOneTarget = arg.sAbsentValue
 	for sSpecies in dGenome2Name.keys():
-		if sSpecies==sRefSpecies:
+		if sSpecies== arg.sRefSpecies:
 			#Already processed
 			continue
 		print str(iCount)+"/"+str(len(dGenome2Name)-1)
 		iCount+=1
-		sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+sVersionDb+"_scan_"+sSpecies+" s where job_id="+sJobId+" "+sregionClause+" and s.match=1;"
-		tSQLtable=SubmitMySQLCommand(sSQLcommand,sHost,sDatabase,sUser,sPw)
-		for tRows in tSQLtable:
+		sSQLcommand="select gene_id,start_match,end_match,sequence_match,strand_match,"+sToolColTarget+",scan_id from "+arg.sVersionDb+"_scan_"+sSpecies+" s where job_id="+arg.sJobId+" "+arg.sregionClause+" and s.match=1;"
+		query = SQLquery(sSQLcommand, arg)
+		for tRows in query.result:
 			sGeneId=tRows[0]
 			sSpeciesId=sGeneId[:-11] #In geneId, the last 11 numbers are the numerical part of ENS id. The part before is the speciesId
 			dData={"Start":tRows[1],"End":tRows[2],"Sequence":tRows[3],"Strand":tRows[4],sToolColTarget:tRows[5]}
@@ -1036,18 +1035,18 @@ def mainprocess():
 
 			bAddHit=True
 
-			if bApplyScoreFilter:
+			if arg.bApplyScoreFilter:
 				#if sSpeciesId in tDisplayToFilter or not sSpeciesId in tDisplaySpecies: 
-				if not sSpeciesId in tDisplaySpecies: 
-					if bApplyMinScore:
-						if fCurrentScore<fMinScore:
+				if not sSpeciesId in arg.tDisplaySpecies: 
+					if arg.bApplyMinScore:
+						if fCurrentScore < arg.fMinScore:
 							bAddHit=False
-					if bApplyMaxScore:
-						if fCurrentScore>fMaxScore:
+					if arg.bApplyMaxScore:
+						if fCurrentScore > arg.fMaxScore:
 							bAddHit=False
 
 			if bAddHit:
-				if bSingleHitAnalysis:
+				if arg.bSingleHitAnalysis:
 					try:
 						fStoredScore=float(dGene2Data[sGeneId][dGene2Data[sGeneId].keys()[0]][sToolColTarget])
 						if fCurrentScore < fStoredScore:
@@ -1130,9 +1129,9 @@ def mainprocess():
 	#Step8: Compute and check if hits are homogeneous for MatchSpecies and RefSpecies
 	iStepCount=StepIncrease(iStepCount,"Apply homology filter",0)
 	tUnalyzedGenes=[]
-	if sOneTarget==sAbsentValue:
+	if sOneTarget == arg.sAbsentValue:
 		print("Warning : no valide results, step skipped")
-	elif not bGetResult:
+	elif not arg.bGetResult:
 		print("Warning : Count option activated, no homologoy tested, step skipped")
                 dClique2Score={}
 	elif bCheckHomogeneous:
@@ -1313,7 +1312,7 @@ def mainprocess():
         for sCliqueId in dClique2Gene:
 	  fWorstGlobalPvalue=-1
 	  for sGeneId in dClique2Gene[sCliqueId]:
-		if sGeneId[:-11] in tCheckedSpecies:
+		if sGeneId[:-11] in arg.tCheckedSpecies:
 			#Warning: a gene can have no hit, so no occurences in dGene2Data
 			try:
 				fLocalBestPvalue=1.0
@@ -1364,7 +1363,7 @@ def mainprocess():
 			dFinal[sCliqueId]={"HGNC":{"full":dClique2HGNC[sCliqueId]["full"],"short":dClique2HGNC[sCliqueId]["short"]},"Content":{}}
 		except KeyError:
 			dFinal[sCliqueId]={"HGNC":{"full":"no HGNC","short":"no HGNC"},"Content":{}}
-		if bCheckHomogeneous:
+		if arg.bCheckHomogeneous:
 			dFinal[sCliqueId]["Score"]=dClique2Score[sCliqueId]
 		dFinal[sCliqueId]["Pvalue"]=dClique2UniqPvalue[sCliqueId]
 		bValidClique=True
@@ -1378,10 +1377,10 @@ def mainprocess():
 					dFinal[sCliqueId]["Content"][sGeneId][sScanId]=dGene2Data[sGeneId][sScanId]
 			except KeyError:
 					sSpeciesId=sGeneId[:-11] #In geneId, the last 11 numbers are the numerical part of ENS id. The part before is the speciesId
-					if sSpeciesId==sRefSpecies:
+					if sSpeciesId == arg.sRefSpecies:
 						bValidClique=False
 						bRefFailure=True
-					elif sSpeciesId in tMatchSpecies:
+					elif sSpeciesId in arg.tMatchSpecies:
 						bValidClique=False
 						tMatchFailure.append(sSpeciesId)
 					else:
@@ -1455,7 +1454,7 @@ def mainprocess():
 	'''
 	#Step13:write the result
 	iStepCount=StepIncrease(iStepCount,"Write the results",0)
-	if not bGetResult:
+	if not arg.bGetResult:
 		#result = count.json
                 if dLost is None:
                     dLost=dict()
@@ -1463,23 +1462,23 @@ def mainprocess():
                     dLost["Heterogeneous"]=None
 		finalRes.dSpeciesCount={"Global":{"cliqueNumber":0,"geneNumber":0,"hitNumber":0,"heterogeneousRejected":dLost["Heterogeneous"]},"Reference":{"geneNumber":0,"hitNumber":0},"MatchSpecies":{},"OrthoSpecies":{},"DisplaySpecies":{}}
 		dSpeciesClassification={}
-		dSpeciesClassification[sRefSpecies]={"type":"Reference","name":dGenome2Name[sRefSpecies]}
-		for sSpeciesId in tMatchSpecies:
+		dSpeciesClassification[arg.sRefSpecies]={"type":"Reference","name":dGenome2Name[arg.sRefSpecies]}
+		for sSpeciesId in arg.tMatchSpecies:
 			dSpeciesClassification[sSpeciesId]={"type":"MatchSpecies","name":dGenome2Name[sSpeciesId]}
 			try:
 				iLostNumber=dLost[sSpeciesId]
 			except KeyError:
 				iLostNumber=0
 			finalRes.dSpeciesCount["MatchSpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0,"lostClique":iLostNumber}
-		for sSpeciesId in tOrthoSpecies:
-			dSpeciesClassification[sSpeciesId]={"type":"OrthoSpecies","name":dGenome2Name[sRefSpecies]}
+		for sSpeciesId in arg.tOrthoSpecies:
+			dSpeciesClassification[sSpeciesId]={"type":"OrthoSpecies","name":dGenome2Name[arg.sRefSpecies]}
 			try:
 				iLostNumber=dLost[sSpeciesId]
 			except KeyError:
 				iLostNumber=0
 			finalRes.dSpeciesCount["OrthoSpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0,"lostClique":iLostNumber}
-		for sSpeciesId in tDisplaySpecies:
-			dSpeciesClassification[sSpeciesId]={"type":"DisplaySpecies","name":dGenome2Name[sRefSpecies]}
+		for sSpeciesId in arg.tDisplaySpecies:
+			dSpeciesClassification[sSpeciesId]={"type":"DisplaySpecies","name":dGenome2Name[arg.sRefSpecies]}
 			finalRes.dSpeciesCount["DisplaySpecies"][dGenome2Name[sSpeciesId]]={"geneNumber":0,"hitNumber":0}
 
 		for sCliqueId in dFinal:
@@ -1491,23 +1490,23 @@ def mainprocess():
 				sSpeciesName=dGenome2Name[sSpeciesId]
 				iHitNumber=len(dFinal[sCliqueId]["Content"][sGeneId])
 				finalRes.dSpeciesCount["Global"]["hitNumber"]+=iHitNumber
-				if sSpeciesId==sRefSpecies:
+				if sSpeciesId == arg.sRefSpecies:
 					finalRes.dSpeciesCount["Reference"]["geneNumber"]+=1
 					finalRes.dSpeciesCount["Reference"]["hitNumber"]+=iHitNumber
                                         finalRes.internal_genes.append(sGeneId)
-				if sSpeciesId in tMatchSpecies:
+				if sSpeciesId in arg.tMatchSpecies:
 					finalRes.dSpeciesCount["MatchSpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["MatchSpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-				if sSpeciesId in tOrthoSpecies:
+				if sSpeciesId in arg.tOrthoSpecies:
 					finalRes.dSpeciesCount["OrthoSpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["OrthoSpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-				if sSpeciesId in tDisplaySpecies:
+				if sSpeciesId in arg.tDisplaySpecies:
 					finalRes.dSpeciesCount["DisplaySpecies"][sSpeciesName]["geneNumber"]+=1
 					finalRes.dSpeciesCount["DisplaySpecies"][sSpeciesName]["hitNumber"]+=iHitNumber
-                finalRes.computeGenes(200)
+                finalRes.computeGenes(200, arg)
                 finalRes.dSpeciesCount["Reference"]["selected_genes"]=finalRes.genes
-                print("sJsonOutputName"+sJsonOutputName)
-		FILE=open(sJsonOutputName,"w")
+                print("sJsonOutputName"+arg.sJsonOutputName)
+		FILE=open(arg.sJsonOutputName,"w")
 		FILE.write(json.dumps(finalRes.dSpeciesCount, indent=4))
 		FILE.close()
 	else:
@@ -1863,7 +1862,7 @@ def mainprocess():
 			print("This genes are stored in the file "+sUnalyzedGenes)
 
 		#Iterer sur le dico result version classe
-
+	'''
 mainprocess()
 
 ########fix :cleaning temp data
