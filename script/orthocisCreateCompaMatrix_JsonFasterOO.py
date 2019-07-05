@@ -825,13 +825,13 @@ class Analysis :
 			self.sOneTarget=tRows[3]
 
 	def hitCliquesFilter(self,arg) : #step 8
-		tUnalyzedGenes=[]
+		self.tUnalyzedGenes=[]
 		if self.sOneTarget == arg.sAbsentValue:
  			print("Warning : no valide results, step skipped")
  		elif not arg.bGetResult:
 			print("Warning : Count option activated, no homologoy tested, step skipped")
 			self.dClique2Score={}
-		elif bCheckHomogeneous:
+		elif arg.bCheckHomogeneous:
 			self.dClique2Score={}
 			iCount=1
 			iFinalCount=len(dClique2Gene)
@@ -866,9 +866,9 @@ class Analysis :
 						break
 				if bBreak:
 					try:
-						tUnalyzedGenes.append(dClique2HGNC[sCliqueId]["short"])
+						self.tUnalyzedGenes.append(dClique2HGNC[sCliqueId]["short"])
 					except KeyError:
-						tUnalyzedGenes.append("NoHGNC OrthocisId-"+sGeneId)
+						self.tUnalyzedGenes.append("NoHGNC OrthocisId-"+sGeneId)
 					#print len(tUnalyzedGenes)
 					del dClique2Gene[sCliqueId]
 					try:
@@ -1037,7 +1037,7 @@ class Analysis :
 			bBestPvalue=True
 		#Create headline of the file
 		sHeaderLine="HGNC long\tHGNC short\tBiotype\t"
-		if len(tExceptedPosition)==0:
+		if len(arg.tExceptedPosition)==0:
 			sExceptedTag=""
 		else:
 			sExceptedTag="[excepted-"+"-".join(arg.tExceptedPosition)+"]"
@@ -1067,11 +1067,11 @@ class Analysis :
 			sHeaderLine+=sSpeciesCategory
 			if bBestPvalue:
 				sHeaderLine+="\t"+sSpeciesShortId+".BestPvalue"
-			sHeaderLine+="\t"+sSpeciesShortId+".gene\t"+sSpeciesShortId+"."+sToolColTarget+"\t"+sSpeciesShortId+".coord\t"+sSpeciesShortId+".sequence\t"
+			sHeaderLine+="\t"+sSpeciesShortId+".gene\t"+sSpeciesShortId+"."+self.sToolColTarget+"\t"+sSpeciesShortId+".coord\t"+sSpeciesShortId+".sequence\t"
 			if sSpeciesId in arg.tDisplaySpecies:
 				sHeaderLine+=sSpeciesShortId+".ortholog\t"
 
-		FILE=open(sResultFileName+".tsv","w")
+		FILE=open(arg.sResultFileName+".tsv","w")
 		FILE.write(sHeaderLine+"\n")
 
 		#Write each line, 1 by valide clique
@@ -1086,7 +1086,7 @@ class Analysis :
 			#Biotype annotation
 			sCurrentLine += self.dClique2Biotype[sCliqueId]+"\t"
 			#Identity Score
-			if bCheckHomogeneous:
+			if arg.bCheckHomogeneous:
 				sCurrentLine+=str(round(self.dFinal[sCliqueId]["Score"],2))+"\t"
 			if arg.bCheckHomogeneous or arg.bSingleHitAnalysis:
 				sCurrentLine+=str(self.dFinal[sCliqueId]["ConservationValue"])+"\t"
@@ -1104,32 +1104,32 @@ class Analysis :
 				sCurrentLine+="\t"
 				bNoGeneValide=True
 				#Search the affiliate gene
-				for sGeneId in dFinal[sCliqueId]["Content"]:
+				for sGeneId in self.dFinal[sCliqueId]["Content"]:
 					if sGeneId[:-11]!=sSpeciesId: #In geneId, the last 11 numbers are the numerical part of ENS id. The part before is the speciesId
 						continue
 					bNoGeneValide=False
 					#two cases : have at least one valide hit or have no hit
 					#but if it is a display or an Ortho, we must indicate the gene name
-					if dFinal[sCliqueId]["Content"][sGeneId].keys()==["noHit"]:
+					if self.dFinal[sCliqueId]["Content"][sGeneId].keys()==["noHit"]:
 						#if displaySpecies, add ortholog information
-						sCurrentLine+=dGenome2ENStag[sSpeciesId]+sGeneId[-11:]+"\t\t\t\t"
+						sCurrentLine+=self.dGenome2ENStag[sSpeciesId]+sGeneId[-11:]+"\t\t\t\t"
 						if bBestPvalue:
 							sCurrentLine+="\t"
-						if sSpeciesId in tDisplaySpecies:
-							sCurrentLine+=dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
+						if sSpeciesId in arg.tDisplaySpecies:
+							sCurrentLine+=self.dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
 					else:
-						sENSid=dGenome2ENStag[sSpeciesId]+sGeneId[-11:]
+						sENSid=self.dGenome2ENStag[sSpeciesId]+sGeneId[-11:]
 						fBestPvalue=1.0
 						sScore=""
 						sCoord=""
 						sSeq=""
 						dElement={}
-						for sScanId in dFinal[sCliqueId]["Content"][sGeneId]:
-							fBestPvalue=min(float(dGene2Data[sGeneId][sScanId][sToolColTarget]),fBestPvalue)
+						for sScanId in self.dFinal[sCliqueId]["Content"][sGeneId]:
+							fBestPvalue=min(float(self.dGene2Data[sGeneId][sScanId][self.sToolColTarget]),fBestPvalue)
 							try:
-								dElement[float(dFinal[sCliqueId]["Content"][sGeneId][sScanId][sToolColTarget])]=(dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Start"]+":"+dFinal[sCliqueId]["Content"][sGeneId][sScanId]["End"]+"("+dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Strand"]+")",dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Sequence"])
+								dElement[float(self.dFinal[sCliqueId]["Content"][sGeneId][sScanId][self.sToolColTarget])]=(self.dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Start"]+":"+self.dFinal[sCliqueId]["Content"][sGeneId][sScanId]["End"]+"("+self.dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Strand"]+")",self.dFinal[sCliqueId]["Content"][sGeneId][sScanId]["Sequence"])
 							except ValueError:
-								print dFinal[sCliqueId]["Content"][sGeneId]
+								print self.dFinal[sCliqueId]["Content"][sGeneId]
 								exit()
 						bFirst=True
 						for fScore in sorted(dElement.keys()):
@@ -1145,13 +1145,13 @@ class Analysis :
 						if bBestPvalue:
 							sCurrentLine+="\t"+str(fBestPvalue)
 						sCurrentLine+="\t"+sScore+"\t"+sCoord+"\t"+sSeq+"\t"
-						if sSpeciesId in tDisplaySpecies:
-							sCurrentLine+=dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
+						if sSpeciesId in arg.tDisplaySpecies:
+							sCurrentLine+=self.dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
                                 #end of the loop
 				if bNoGeneValide:
 					sCurrentLine+="\t\t\t\t"
-					if sSpeciesId in tDisplaySpecies:
-						sCurrentLine+=dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
+					if sSpeciesId in arg.tDisplaySpecies:
+						sCurrentLine+=self.dDisplay2Ortholog[sSpeciesId][sCliqueId]+"\t"
 			#End of the line                
 			sCurrentLine+="\n"
 			FILE.write(sCurrentLine)
@@ -1159,15 +1159,15 @@ class Analysis :
 
 		FILE.close()
 
-		print sResultFileName
-		print("The file "+sResultFileName+" contains "+str(iWritedClique)+" genes")
-		if len(tUnalyzedGenes)>0:
-			sUnalyzedGenes="UnalyzedGenes-lim"+str(iHomogeneityLimit)+"-"+sResultFileName+".txt"
-			FILE=open(sUnalyzedGenes,"w")
-			FILE.write("\n".join(tUnalyzedGenes))
+		print arg.sResultFileName
+		print("The file "+arg.sResultFileName+" contains "+str(iWritedClique)+" genes")
+		if len(self.tUnalyzedGenes)>0:
+			self.sUnalyzedGenes="UnalyzedGenes-lim"+str(iHomogeneityLimit)+"-"+arg.sResultFileName+".txt"
+			FILE=open(self.sUnalyzedGenes,"w")
+			FILE.write("\n".join(self.tUnalyzedGenes))
 			FILE.close()
-			print("There is "+str(len(tUnalyzedGenes))+" genes with too much hits for the homogenity computation (limit: "+str(iHomogeneityLimit)+").")
-			print("This genes are stored in the file "+sUnalyzedGenes)
+			print("There is "+str(len(self.tUnalyzedGenes))+" genes with too much hits for the homogenity computation (limit: "+str(iHomogeneityLimit)+").")
+			print("This genes are stored in the file "+self.sUnalyzedGenes)
 
 				
 		
